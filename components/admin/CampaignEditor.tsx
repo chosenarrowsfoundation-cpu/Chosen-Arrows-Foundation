@@ -27,9 +27,14 @@ import {
 } from '@/components/ui/select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Switch } from '@/components/ui/switch'
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 import { languages, languageNames } from '@/lib/constants'
 import { toast } from 'sonner'
-import { Loader2, Save, Copy, CheckCircle2 } from 'lucide-react'
+import { Loader2, Save, Copy, CheckCircle2, ChevronDown } from 'lucide-react'
 import { createCampaign, type CampaignInput } from '@/app/actions/campaigns/create-campaign'
 import { updateCampaign } from '@/app/actions/campaigns/update-campaign'
 import type { Campaign } from '@/app/actions/campaigns/get-campaigns'
@@ -211,6 +216,8 @@ export default function CampaignEditor({ campaign }: CampaignEditorProps) {
     location: null,
   }
 
+  const enIndex = form.watch('translations').findIndex(t => t.language_code === 'en')
+
   return (
     <Card>
       <CardHeader>
@@ -218,7 +225,214 @@ export default function CampaignEditor({ campaign }: CampaignEditorProps) {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-6">
+            {!isEditing ? (
+              /* Simplified create flow: single form, no tabs */
+              <div className="space-y-5">
+                <FormField
+                  control={form.control}
+                  name={`translations.${enIndex}.title`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e)
+                            handleTitleChange(e.target.value, 'en')
+                          }}
+                          placeholder="e.g. Support Maria's Education"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={`translations.${enIndex}.story`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Short story</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          {...field}
+                          value={field.value || ''}
+                          className="min-h-24"
+                          placeholder="Brief description for campaign cards..."
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="goal_amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Goal ($)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                            min="1"
+                            step="0.01"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Status</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="draft">Draft</SelectItem>
+                            <SelectItem value="active">Active</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="archived">Archived</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  URL slug: <span className="font-mono">{form.watch('slug') || '—'}</span>
+                </p>
+                <FormField
+                  control={form.control}
+                  name="slug"
+                  render={({ field }) => (
+                    <FormItem className="sr-only">
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                <Collapsible defaultOpen={false}>
+                  <CollapsibleTrigger asChild>
+                    <Button type="button" variant="ghost" size="sm" className="gap-2 text-muted-foreground">
+                      <ChevronDown className="h-4 w-4" />
+                      Optional settings
+                    </Button>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="space-y-4 pt-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      <FormField
+                        control={form.control}
+                        name="raised_amount"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Raised ($)</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                {...field}
+                                onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                min="0"
+                                step="0.01"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="donor_count"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Donor count</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                {...field}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                min="0"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="days_left"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Days left</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                {...field}
+                                value={field.value ?? ''}
+                                onChange={(e) => field.onChange(e.target.value ? parseInt(e.target.value) : null)}
+                                min="0"
+                                placeholder="Optional"
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name="category"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Category</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value || ''}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Optional" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="Education">Education</SelectItem>
+                                <SelectItem value="Healthcare">Healthcare</SelectItem>
+                                <SelectItem value="Skills">Skills</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="featured"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                          <div className="space-y-0.5">
+                            <FormLabel>Featured on homepage</FormLabel>
+                            <p className="text-xs text-muted-foreground">Show this campaign on the homepage</p>
+                          </div>
+                          <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </CollapsibleContent>
+                </Collapsible>
+              </div>
+            ) : (
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="basic">Basic Info</TabsTrigger>
@@ -227,7 +441,7 @@ export default function CampaignEditor({ campaign }: CampaignEditorProps) {
                 <TabsTrigger value="updates">Updates</TabsTrigger>
               </TabsList>
 
-              {/* Basic Info Tab */}
+              {/* Basic Info Tab - form fields only, no nested form in sibling tabs */}
               <TabsContent value="basic" className="space-y-4 mt-6">
                 <div className="grid gap-4 md:grid-cols-2">
                   <FormField
@@ -590,7 +804,7 @@ export default function CampaignEditor({ campaign }: CampaignEditorProps) {
 
               {/* Updates Tab */}
               <TabsContent value="updates" className="space-y-4 mt-6">
-                {isEditing && campaign ? (
+                {campaign ? (
                   <CampaignUpdatesManager campaignId={campaign.id} />
                 ) : (
                   <div className="text-center py-12 border-2 border-dashed rounded-lg">
@@ -604,6 +818,7 @@ export default function CampaignEditor({ campaign }: CampaignEditorProps) {
                 )}
               </TabsContent>
             </Tabs>
+            )}
 
             <div className="flex justify-end gap-2 pt-4 border-t">
               <Button
@@ -613,7 +828,11 @@ export default function CampaignEditor({ campaign }: CampaignEditorProps) {
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSaving}>
+              <Button
+                type="button"
+                onClick={() => form.handleSubmit(onSubmit)()}
+                disabled={isSaving}
+              >
                 {isSaving ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -627,7 +846,7 @@ export default function CampaignEditor({ campaign }: CampaignEditorProps) {
                 )}
               </Button>
             </div>
-          </form>
+          </div>
         </Form>
       </CardContent>
     </Card>

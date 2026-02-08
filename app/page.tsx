@@ -7,7 +7,7 @@ import CommunitySection from "@/components/CommunitySection";
 import CTASection from "@/components/CTASection";
 import { getContent } from "@/app/actions/content/get-content";
 import { getCampaigns } from "@/app/actions/campaigns/get-campaigns";
-import { getTestimonials } from "@/app/actions/testimonials/get-testimonials";
+import { getGoogleTestimonials } from "@/app/actions/testimonials/get-google-testimonials";
 import { getSetting } from "@/app/actions/settings/get-settings";
 import { getServerLanguage } from "@/lib/i18n";
 import { getPageMetadata } from "@/app/actions/metadata/get-page-metadata";
@@ -66,14 +66,16 @@ export default async function HomePage() {
     getContent('impact', language).catch(() => null),
     getContent('community', language).catch(() => null),
     getContent('cta', language).catch(() => null),
-    getCampaigns(language, { limit: 2 }).catch(() => []),
-    getTestimonials({ activeOnly: true }).catch(() => []),
+    getCampaigns(language, { limit: 5, status: 'active' }).catch(() => []),
+    getGoogleTestimonials(language).catch(() => []),
     getSetting('hero_stats').catch(() => null),
   ]);
 
   // Transform campaigns to match CampaignsSection expected format
+  // Campaigns are already ordered by creation date (newest first) from getCampaigns
   const campaigns = campaignsRaw.map(campaign => ({
     id: campaign.id,
+    slug: campaign.slug,
     name: campaign.translation?.title || '',
     age: campaign.translation?.child_age || null,
     location: campaign.translation?.location || null,

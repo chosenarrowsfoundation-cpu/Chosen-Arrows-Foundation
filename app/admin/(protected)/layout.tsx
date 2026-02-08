@@ -1,7 +1,9 @@
 import { redirect } from 'next/navigation'
 import { checkAdminAuth } from '@/app/actions/auth/check-admin-auth'
 import AdminSidebar from '@/components/admin/AdminSidebar'
-import AdminHeader from '@/components/admin/AdminHeader'
+import AdminMainContent from '@/components/admin/AdminMainContent'
+import { AdminLayoutWrapper } from '@/components/admin/AdminLayoutWrapper'
+import { AdminLayoutProvider } from '@/contexts/AdminLayoutContext'
 
 export default async function AdminLayout({
   children,
@@ -15,14 +17,13 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-muted/40">
-      <AdminHeader user={adminUser} />
-      <div className="flex">
+    <AdminLayoutWrapper>
+      <AdminLayoutProvider>
         <AdminSidebar />
-        <main className="flex-1 p-6 lg:p-8">
+        <AdminMainContent user={adminUser}>
           {children}
-        </main>
-      </div>
-    </div>
+        </AdminMainContent>
+      </AdminLayoutProvider>
+    </AdminLayoutWrapper>
   )
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { Facebook, Twitter, Instagram, Linkedin, Mail } from "lucide-react";
+import { Facebook, X, Instagram, Linkedin, Mail } from "lucide-react";
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
@@ -33,10 +33,10 @@ const Footer = () => {
   }, []);
 
   const quickLinks = [
-    { href: "#mission", label: t("footer.ourMission") },
-    { href: "#campaigns", label: t("footer.activeCampaigns") },
-    { href: "#impact", label: t("footer.ourImpact") },
-    { href: "#community", label: t("footer.community") },
+    { href: "/#mission", label: t("footer.ourMission") },
+    { href: "/#campaigns", label: t("footer.activeCampaigns") },
+    { href: "/#impact", label: t("footer.ourImpact") },
+    { href: "/#community", label: t("footer.community") },
   ];
 
   const getInvolved = [
@@ -48,15 +48,15 @@ const Footer = () => {
 
   const socialLinksArray = [
     { icon: Facebook, href: socialLinks?.facebook || "#", label: "Facebook" },
-    { icon: Twitter, href: socialLinks?.twitter || "#", label: "Twitter" },
+    { icon: X, href: socialLinks?.twitter || "https://x.com/ChosenArrows", label: "X" },
     { icon: Instagram, href: socialLinks?.instagram || "#", label: "Instagram" },
-    { icon: Linkedin, href: socialLinks?.linkedin || "#", label: "LinkedIn" },
+    { icon: Linkedin, href: socialLinks?.linkedin || "https://www.linkedin.com/company/chosen-arrows-foundation", label: "LinkedIn" },
   ];
 
   const email = contactInfo?.email || "ChosenArrowsFoundation@gmail.com";
 
   return (
-    <footer className="bg-gradient-to-b from-white to-mint-50/30 border-t border-mint-200/50">
+    <footer className="bg-gradient-to-b from-white to-mint-50/30 dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900 dark:via-[#11111b] dark:to-black border-t border-mint-200/50 dark:border-white/5">
       <div className="enterprise-container py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
           {/* Brand */}
@@ -83,6 +83,8 @@ const Footer = () => {
                   <a
                     key={social.label}
                     href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-9 h-9 rounded-full bg-mint-100 hover:bg-taffy-100 flex items-center justify-center text-mint-600 hover:text-taffy-500 transition-colors duration-200"
                     aria-label={social.label}
                   >
@@ -101,12 +103,12 @@ const Footer = () => {
             <ul className="space-y-2.5">
               {quickLinks.map((link) => (
                 <li key={link.href}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-sm text-muted-foreground hover:text-foreground transition-colors duration-150"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -158,15 +160,15 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
             <p>© 2025 Chosen Arrows Foundation. {t("footer.rights")}.</p>
             <div className="flex gap-6">
-              <a href="#" className="hover:text-foreground transition-colors duration-150">
+              <Link href="/privacy-policy" className="hover:text-foreground transition-colors duration-150">
                 {t("footer.privacy")}
-              </a>
-              <a href="#" className="hover:text-foreground transition-colors duration-150">
+              </Link>
+              <Link href="/terms-of-service" className="hover:text-foreground transition-colors duration-150">
                 {t("footer.terms")}
-              </a>
-              <a href="#" className="hover:text-foreground transition-colors duration-150">
+              </Link>
+              <Link href="/transparency-repo" className="hover:text-foreground transition-colors duration-150">
                 {t("footer.transparency")}
-              </a>
+              </Link>
             </div>
           </div>
         </div>

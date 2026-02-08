@@ -118,20 +118,6 @@ const ValuesSection = ({ content }: { content?: ValuesContent }) => {
             );
           })}
         </div>
-
-        {/* Mission Statement */}
-        <div className="max-w-3xl mx-auto mt-12 md:mt-16">
-          <div className="enterprise-card p-8 md:p-10 text-center bg-gradient-to-br from-white via-mint-50/30 to-taffy-50/20 border-mint-200/50">
-            <blockquote>
-              <p className="text-lg md:text-xl text-foreground font-medium leading-relaxed mb-4">
-                &ldquo;{content?.vision?.quote ?? t("values.visionQuote")}&rdquo;
-              </p>
-              <footer className="text-sm text-taffy-500 font-medium">
-                — {content?.vision?.title ?? t("values.vision")}
-              </footer>
-            </blockquote>
-          </div>
-        </div>
       </div>
     </section>
   );

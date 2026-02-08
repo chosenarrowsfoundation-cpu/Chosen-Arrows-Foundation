@@ -1,7 +1,8 @@
 "use client";
 
-import { GraduationCap, Users, BookOpen, Heart, TrendingUp, Globe } from "lucide-react";
+import { GraduationCap, Users, BookOpen, Heart, TrendingUp, Globe, ArrowRight } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import Link from "next/link";
 
 type ImpactContent = {
   title?: string;
@@ -64,24 +65,19 @@ const ImpactSection = ({ content }: { content?: ImpactContent }) => {
 
   const stats = content?.stats?.length
     ? content.stats.map((stat, index) => ({
-        icon: iconList[index % iconList.length],
-        value: stat.value,
-        label: stat.label,
-        description: stat.description,
-      }))
+      icon: iconList[index % iconList.length],
+      value: stat.value,
+      label: stat.label,
+      description: stat.description,
+    }))
     : fallbackStats.map((stat) => ({
-        ...stat,
-        label: t(stat.labelKey),
-        description: t(stat.descKey),
-      }));
+      ...stat,
+      label: t(stat.labelKey),
+      description: t(stat.descKey),
+    }));
 
   const title = content?.title ?? t("impact.title");
   const subtitle = content?.subtitle ?? t("impact.subtitle");
-  const transparencyTitle = content?.transparency?.title ?? t("impact.transparencyTitle");
-  const transparencyDesc = content?.transparency?.description ?? t("impact.transparencyDesc");
-  const transparencyFeatures = content?.transparency?.features?.length
-    ? content.transparency.features
-    : [t("impact.realTime"), t("impact.verified"), t("impact.accountability")];
 
   return (
     <section id="impact" className="section-padding bg-background">
@@ -120,25 +116,19 @@ const ImpactSection = ({ content }: { content?: ImpactContent }) => {
           })}
         </div>
 
-        {/* Transparency Card */}
-        <div className="max-w-3xl mx-auto mt-12 md:mt-16">
-          <div className="enterprise-card p-8 md:p-10">
-            <div className="text-center">
-              <h3 className="text-xl font-semibold text-foreground mb-3">
-                {transparencyTitle}
-              </h3>
-              <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
-                {transparencyDesc}
-              </p>
-              <div className="flex flex-wrap justify-center gap-6">
-                {transparencyFeatures.map((feature, index) => (
-                  <div key={`${feature}-${index}`} className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-mint-400" />
-                    <span className="text-sm font-medium text-foreground">{feature}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
+        {/* Transparency CTA */}
+        <div className="mt-12 md:mt-16 text-center">
+          <div className="inline-flex flex-col items-center">
+            <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
+              {t("impact.transparencyDesc")}
+            </p>
+            <Link
+              href="/transparency-repo"
+              className="inline-flex items-center text-primary font-semibold hover:underline group"
+            >
+              {t("impact.realTime")}
+              <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
           </div>
         </div>
       </div>

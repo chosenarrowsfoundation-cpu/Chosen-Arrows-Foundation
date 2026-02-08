@@ -53,8 +53,11 @@ export default function CampaignUpdatesManager({ campaignId }: CampaignUpdatesMa
     setIsLoading(false)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async () => {
+    if (!formData.update_date || !formData.content.trim()) {
+      toast.error('Please fill in the date and content')
+      return
+    }
     setIsSaving(true)
 
     try {
@@ -131,7 +134,7 @@ export default function CampaignUpdatesManager({ campaignId }: CampaignUpdatesMa
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-4">
             <div>
               <Label htmlFor="update_date">Update Date</Label>
               <Input
@@ -156,7 +159,7 @@ export default function CampaignUpdatesManager({ campaignId }: CampaignUpdatesMa
             </div>
 
             <div className="flex gap-2">
-              <Button type="submit" disabled={isSaving}>
+              <Button type="button" onClick={handleSubmit} disabled={isSaving}>
                 {isSaving ? 'Saving...' : editingUpdate ? 'Update' : 'Add Update'}
               </Button>
               {editingUpdate && (
@@ -165,7 +168,7 @@ export default function CampaignUpdatesManager({ campaignId }: CampaignUpdatesMa
                 </Button>
               )}
             </div>
-          </form>
+          </div>
         </CardContent>
       </Card>
 

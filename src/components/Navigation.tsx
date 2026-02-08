@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useTranslation } from "react-i18next";
 import LanguageSwitcher from "./LanguageSwitcher";
+import { ThemeToggle } from "./ThemeToggle";
 import logo from "@/assets/logo.jpg";
 
 const Navigation = () => {
@@ -15,6 +16,7 @@ const Navigation = () => {
 
   const navLinks = [
     { href: "/about", label: t("nav.about") },
+    { href: "/blog", label: t("nav.blog") },
     { href: "/campaigns", label: t("nav.campaigns") },
     { href: "/mentorship", label: t("nav.mentorship") },
     { href: "/contact", label: t("nav.contact") },
@@ -54,10 +56,11 @@ const Navigation = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center gap-4">
+            <ThemeToggle />
             <LanguageSwitcher />
             <Link href="/donate">
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 variant="gradient"
                 className="px-5 rounded-full"
               >
@@ -90,7 +93,8 @@ const Navigation = () => {
                   {link.label}
                 </Link>
               ))}
-              <div className="py-2.5 px-3">
+              <div className="py-2.5 px-3 flex items-center gap-4">
+                <ThemeToggle />
                 <LanguageSwitcher />
               </div>
               <div className="pt-4 mt-2 border-t border-border">

@@ -51,9 +51,9 @@ async function seedSettings() {
         setting_key: 'social_links',
         setting_value: {
           facebook: "https://facebook.com/chosenarrowsfoundation",
-          twitter: "https://twitter.com/chosenarrows",
+          twitter: "https://x.com/ChosenArrows",
           instagram: "https://instagram.com/chosenarrows",
-          linkedin: "https://linkedin.com/company/chosen-arrows-foundation"
+          linkedin: "https://www.linkedin.com/company/chosen-arrows-foundation"
         },
         description: 'Social media links for footer'
       }, { onConflict: 'setting_key' })
@@ -81,6 +81,24 @@ async function seedSettings() {
       console.error('❌ Error seeding hero_stats:', statsError.message)
     } else {
       console.log('✅ Seeded hero_stats')
+    }
+
+    // Insert testimonials_config (Google Business Profile)
+    const { error: testimonialsError } = await supabase
+      .from('site_settings')
+      .upsert({
+        setting_key: 'testimonials_config',
+        setting_value: {
+          enabled: false,
+          google_place_id: null
+        },
+        description: 'Testimonials from Google Business Profile'
+      }, { onConflict: 'setting_key' })
+
+    if (testimonialsError) {
+      console.error('❌ Error seeding testimonials_config:', testimonialsError.message)
+    } else {
+      console.log('✅ Seeded testimonials_config')
     }
 
     console.log('\n🎉 Site settings seeded successfully!')

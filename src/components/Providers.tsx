@@ -11,21 +11,17 @@ import i18n from "@/i18n/config";
 
 const queryClient = new QueryClient();
 
-export function Providers({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return <>{children}</>;
+export function Providers({ children, lang }: { children: React.ReactNode; lang: string }) {
+  // Initialize i18n with the server-side language if they don't match
+  // This prevents hydration mismatch between server and client translations
+  if (i18n.language !== lang) {
+    i18n.changeLanguage(lang);
   }
 
   return (
     <QueryClientProvider client={queryClient}>
       <I18nextProvider i18n={i18n}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <TooltipProvider>
             <Toaster />
             <Sonner />

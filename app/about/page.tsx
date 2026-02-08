@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Target, Sparkles } from "lucide-react";
+import { Target, Sparkles, ShieldCheck, FileSearch, BarChart3 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import CTASection from "@/components/CTASection";
 
 export const metadata: Metadata = {
   title: "About Us | Chosen Arrows Foundation",
@@ -108,6 +109,60 @@ export default function AboutPage() {
           </div>
         </section>
 
+        {/* Transparency & Accountability */}
+        <section className="py-20 bg-background">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-4xl font-bold mb-4">
+                  Transparency in <span className="text-mint-500">Every Step</span>
+                </h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  We believe in complete transparency. Every donation is tracked, every milestone is documented, and every success story is shared. You do not just give — you witness the transformation.
+                </p>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8">
+                <Card className="border-taffy-200/50 hover:shadow-lg hover:shadow-taffy-100/50 transition-shadow duration-300">
+                  <CardContent className="p-8 text-center space-y-4">
+                    <div className="w-14 h-14 mx-auto rounded-xl bg-gradient-to-br from-taffy-100 to-taffy-200 flex items-center justify-center">
+                      <BarChart3 className="w-7 h-7 text-taffy-600" />
+                    </div>
+                    <h3 className="text-xl font-bold">Real-time Tracking</h3>
+                    <p className="text-muted-foreground">
+                      Monitor the progress of projects and individual student achievements as they happen.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-mint-200/50 hover:shadow-lg hover:shadow-mint-100/50 transition-shadow duration-300">
+                  <CardContent className="p-8 text-center space-y-4">
+                    <div className="w-14 h-14 mx-auto rounded-xl bg-gradient-to-br from-mint-100 to-mint-200 flex items-center justify-center">
+                      <ShieldCheck className="w-7 h-7 text-mint-600" />
+                    </div>
+                    <h3 className="text-xl font-bold">Verified Impact</h3>
+                    <p className="text-muted-foreground">
+                      Every dollar is accounted for, ensuring maximum impact for the children we serve.
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-taffy-200/50 hover:shadow-lg hover:shadow-taffy-100/50 transition-shadow duration-300">
+                  <CardContent className="p-8 text-center space-y-4">
+                    <div className="w-14 h-14 mx-auto rounded-xl bg-gradient-to-br from-taffy-100 to-taffy-200 flex items-center justify-center">
+                      <FileSearch className="w-7 h-7 text-taffy-600" />
+                    </div>
+                    <h3 className="text-xl font-bold">Accountability</h3>
+                    <p className="text-muted-foreground">
+                      Regular reports and updates keep our community informed and engaged with our mission.
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Image Gallery Grid */}
         <section className="py-16 bg-background">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -166,6 +221,9 @@ export default function AboutPage() {
             </div>
           </div>
         </section>
+
+        {/* CTA Section */}
+        <CTASection />
       </main>
   );
 }

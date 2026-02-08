@@ -7,11 +7,11 @@ import { createClient } from '@/lib/supabase/server'
 export default async function EditCampaignPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  // Fetch campaign with all language translations
+  const { id } = await params
   const campaignsByLanguage = await Promise.all(
-    languages.map(lang => getCampaign(params.id, lang))
+    languages.map(lang => getCampaign(id, lang))
   )
 
   const campaign = campaignsByLanguage.find(c => c !== null)
@@ -20,7 +20,6 @@ export default async function EditCampaignPage({
     notFound()
   }
 
-  // Fetch campaign images
   const supabase = await createClient()
   const { data: images } = await supabase
     .from('campaign_images')

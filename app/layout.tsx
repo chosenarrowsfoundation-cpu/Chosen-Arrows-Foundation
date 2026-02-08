@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Providers } from "@/components/Providers";
 import LayoutWrapper from "@/components/LayoutWrapper";
+import { getServerLanguage } from "@/lib/i18n";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -45,15 +46,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const lang = await getServerLanguage();
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={lang} suppressHydrationWarning>
       <body className="antialiased">
-        <Providers>
+        <Providers lang={lang}>
           <LayoutWrapper>
             {children}
           </LayoutWrapper>
