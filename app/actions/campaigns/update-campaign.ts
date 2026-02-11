@@ -80,6 +80,7 @@ export async function updateCampaign(
   revalidatePath('/admin/campaigns')
   revalidatePath('/campaigns')
   revalidatePath(`/campaigns/${campaignId}`)
+  revalidatePath('/')
 
   return { success: true }
 }

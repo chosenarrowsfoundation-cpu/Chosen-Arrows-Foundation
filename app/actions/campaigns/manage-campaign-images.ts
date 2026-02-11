@@ -60,6 +60,8 @@ export async function addCampaignImage(
 
   revalidatePath(`/admin/campaigns/${campaignId}`)
   revalidatePath('/admin/campaigns')
+  revalidatePath('/campaigns')
+  revalidatePath('/')
 
   return { success: true }
 }
@@ -103,6 +105,8 @@ export async function updateCampaignImage(
 
   revalidatePath(`/admin/campaigns/${campaignId}`)
   revalidatePath('/admin/campaigns')
+  revalidatePath('/campaigns')
+  revalidatePath('/')
 
   return { success: true }
 }
@@ -148,6 +152,8 @@ export async function deleteCampaignImage(
 
   revalidatePath(`/admin/campaigns/${campaignId}`)
   revalidatePath('/admin/campaigns')
+  revalidatePath('/campaigns')
+  revalidatePath('/')
 
   return { success: true }
 }

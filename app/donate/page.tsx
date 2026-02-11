@@ -28,8 +28,22 @@ const defaultManualPayment = {
   },
 };
 
-export default async function DonatePage() {
+type DonatePageProps = {
+  searchParams?: Promise<{ campaign_id?: string }> | { campaign_id?: string };
+};
+
+export default async function DonatePage({ searchParams }: DonatePageProps) {
   const manualPayment = (await getSetting("manual_payment_details")) as typeof defaultManualPayment | null;
   const manualPaymentDetails = manualPayment?.bank && manualPayment?.mpesa ? manualPayment : defaultManualPayment;
-  return <DonateClient manualPaymentDetails={manualPaymentDetails} />;
+  const resolved =
+    searchParams && typeof (searchParams as Promise<unknown>).then === "function"
+      ? await (searchParams as Promise<{ campaign_id?: string }>)
+      : (searchParams as { campaign_id?: string }) ?? {};
+  const campaignId = resolved.campaign_id ?? undefined;
+  return (
+    <DonateClient
+      manualPaymentDetails={manualPaymentDetails}
+      campaignId={campaignId}
+    />
+  );
 }

@@ -96,8 +96,10 @@ type PublicConfig = {
 
 export default function DonateClient({
   manualPaymentDetails = defaultManualPayment,
+  campaignId,
 }: {
   manualPaymentDetails?: ManualPaymentDetails;
+  campaignId?: string;
 }) {
   const [selectedAmount, setSelectedAmount] = useState("50");
   const bankDetails = manualPaymentDetails?.bank ?? defaultManualPayment.bank;
@@ -148,6 +150,7 @@ export default function DonateClient({
         frequency: values.frequency,
         donorName: values.name,
         donorEmail: values.email,
+        ...(campaignId ? { campaignId } : {}),
       }),
     });
     const data = await res.json();
@@ -156,7 +159,7 @@ export default function DonateClient({
       throw new Error(data.error ?? "Create order failed");
     }
     return data.orderId;
-  }, [form]);
+  }, [form, campaignId]);
 
   const onApprove = useCallback(
     async (data: { orderID: string }) => {
@@ -169,6 +172,7 @@ export default function DonateClient({
           donorName: values.name,
           donorEmail: values.email,
           frequency: values.frequency,
+          ...(campaignId ? { campaignId } : {}),
         }),
       });
       const json = await res.json();
@@ -182,7 +186,7 @@ export default function DonateClient({
       });
       window.location.href = `/donate/success?${params.toString()}`;
     },
-    [form]
+    [form, campaignId]
   );
 
   const handleAmountSelect = (amount: string) => {

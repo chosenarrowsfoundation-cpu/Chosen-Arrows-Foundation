@@ -4,11 +4,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import Image from "next/image";
+import Link from "next/link";
 import { Heart, Calendar, Users, Target, Share2 } from "lucide-react";
 import type { StaticImageData } from "next/image";
 
 interface CampaignDetailClientProps {
   campaign: {
+    id: string;
+    slug: string;
     title: string;
     child: string;
     fullStory: string;
@@ -23,7 +26,10 @@ interface CampaignDetailClientProps {
 }
 
 export default function CampaignDetailClient({ campaign }: CampaignDetailClientProps) {
-  const progress = (campaign.raised / campaign.goal) * 100;
+  const progress =
+    campaign.goal > 0
+      ? Math.min(100, (campaign.raised / campaign.goal) * 100)
+      : 0;
 
   return (
     <main className="pt-24 pb-20">
@@ -109,10 +115,12 @@ export default function CampaignDetailClient({ campaign }: CampaignDetailClientP
                       </div>
                     </div>
 
-                    <Button variant="gradient" className="w-full h-12 text-lg rounded-full">
-                      <Heart className="w-5 h-5 mr-2" fill="currentColor" />
-                      Donate Now
-                    </Button>
+                    <Link href={`/donate?campaign_id=${campaign.id}`}>
+                      <Button variant="gradient" className="w-full h-12 text-lg rounded-full">
+                        <Heart className="w-5 h-5 mr-2" fill="currentColor" />
+                        Donate Now
+                      </Button>
+                    </Link>
 
                     <Button variant="outline" className="w-full rounded-full">
                       <Share2 className="w-4 h-4 mr-2" />

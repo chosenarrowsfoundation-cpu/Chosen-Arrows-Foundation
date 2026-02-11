@@ -32,6 +32,7 @@ export async function deleteCampaign(
 
   revalidatePath('/admin/campaigns')
   revalidatePath('/campaigns')
+  revalidatePath('/')
 
   return { success: true }
 }

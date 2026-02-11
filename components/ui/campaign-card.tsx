@@ -8,6 +8,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
+// Fallback when campaign has no image (matches homepage CampaignsSection behavior)
+import fallbackCampaignImage from "@/assets/child-1.jpg";
+
 export interface UnifiedCampaignCardProps {
   campaign: {
     id: string;
@@ -35,25 +38,22 @@ export function UnifiedCampaignCard({
   showCategory = false,
   imageHeight = "h-64",
 }: UnifiedCampaignCardProps) {
-  const progress = (campaign.raised / campaign.goal) * 100;
+  const progress =
+    campaign.goal > 0
+      ? Math.min(100, (campaign.raised / campaign.goal) * 100)
+      : 0;
 
   return (
     <Card className="group hover:shadow-[var(--shadow-divine)] transition-all duration-300 hover:-translate-y-2 overflow-hidden">
       <div className={cn("relative overflow-hidden bg-muted", imageHeight)}>
-        {campaign.image ? (
-          <Image
-            src={campaign.image}
-            alt={campaign.child}
-            fill
-            quality={85}
-            className="object-cover group-hover:scale-110 transition-transform duration-500"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-mint-100 to-taffy-100">
-            <Heart className="w-16 h-16 text-mint-300" />
-          </div>
-        )}
+        <Image
+          src={campaign.image || fallbackCampaignImage}
+          alt={campaign.child}
+          fill
+          quality={85}
+          className="object-cover group-hover:scale-110 transition-transform duration-500"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
         {showCategory && campaign.category && (
           <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-primary/90 text-primary-foreground text-sm font-semibold backdrop-blur-sm">
             {campaign.category}

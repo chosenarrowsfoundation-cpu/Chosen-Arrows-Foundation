@@ -87,6 +87,7 @@ export async function createCampaign(
 
   revalidatePath('/admin/campaigns')
   revalidatePath('/campaigns')
+  revalidatePath('/')
 
   return { success: true, campaignId: campaign.id }
 }

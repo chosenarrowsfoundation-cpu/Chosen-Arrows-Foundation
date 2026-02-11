@@ -87,6 +87,8 @@ export default async function CampaignDetailPage({ params }: { params: { id: str
 
   // Transform campaign data to match component format
   const campaignData = {
+    id: campaign.id,
+    slug: campaign.slug,
     title: campaign.translation?.title || '',
     child,
     fullStory: campaign.translation?.full_story || campaign.translation?.story || '',
