@@ -85,8 +85,9 @@ export default function CampaignImageManager({
         })
       }
     } catch (error) {
-      toast.error('An error occurred', {
-        description: 'Please try again later.',
+      const message = error instanceof Error ? error.message : 'Please try again later.'
+      toast.error('Upload failed', {
+        description: message,
       })
     } finally {
       setIsUploading(false)

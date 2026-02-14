@@ -16,9 +16,12 @@ function formatUpdateDate(dateString: string): string {
   }
 }
 
-export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+type PageParams = { params: Promise<{ id: string }> };
+
+export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const language = await getServerLanguage();
-  const campaign = await getCampaign(params.id, language);
+  const { id } = await params;
+  const campaign = await getCampaign(id, language);
 
   if (!campaign || campaign.status !== 'active') {
     return {
@@ -63,9 +66,10 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   };
 }
 
-export default async function CampaignDetailPage({ params }: { params: { id: string } }) {
+export default async function CampaignDetailPage({ params }: PageParams) {
   const language = await getServerLanguage();
-  const campaign = await getCampaign(params.id, language);
+  const { id } = await params;
+  const campaign = await getCampaign(id, language);
 
   if (!campaign || campaign.status !== 'active') {
     notFound();

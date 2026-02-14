@@ -50,15 +50,26 @@ const campaignSchema = z.object({
   days_left: z.number().nullable(),
   category: z.string().nullable(),
   featured: z.boolean(),
-  translations: z.array(z.object({
-    language_code: z.string(),
-    title: z.string().min(1, 'Title is required'),
-    story: z.string().min(1, 'Story is required'),
-    full_story: z.string().nullable(),
-    child_name: z.string().nullable(),
-    child_age: z.number().nullable(),
-    location: z.string().nullable(),
-  })),
+  translations: z
+    .array(
+      z.object({
+        language_code: z.string(),
+        title: z.string(),
+        story: z.string(),
+        full_story: z.string().nullable(),
+        child_name: z.string().nullable(),
+        child_age: z.number().nullable(),
+        location: z.string().nullable(),
+      })
+    )
+    .refine(
+      (arr) =>
+        arr.some(
+          (t) =>
+            (t.title?.trim() || '').length >= 1 && (t.story?.trim() || '').length >= 1
+        ),
+      { message: 'At least one language (e.g. English) must have a title and short story.' }
+    ),
 })
 
 type CampaignFormValues = z.infer<typeof campaignSchema>
@@ -118,7 +129,7 @@ export default function CampaignEditor({ campaign }: CampaignEditorProps) {
     defaultValues: {
       slug: campaign?.slug || '',
       status: (campaign?.status as any) || 'draft',
-      goal_amount: campaign?.goal_amount || 0,
+      goal_amount: campaign?.goal_amount ?? (campaign ? 0 : 1),
       raised_amount: campaign?.raised_amount || 0,
       donor_count: campaign?.donor_count || 0,
       days_left: campaign?.days_left,
@@ -184,7 +195,13 @@ export default function CampaignEditor({ campaign }: CampaignEditorProps) {
           })
         }
       } else {
-        const result = await createCampaign(data as CampaignInput)
+        const filledTranslations = data.translations.filter(
+          (t) => (t.title?.trim() || '').length >= 1 && (t.story?.trim() || '').length >= 1
+        )
+        const result = await createCampaign({
+          ...data,
+          translations: filledTranslations,
+        } as CampaignInput)
         if (result.success) {
           toast.success('Campaign created', {
             description: 'Redirecting to campaign page...',
@@ -263,6 +280,15 @@ export default function CampaignEditor({ campaign }: CampaignEditorProps) {
                           placeholder="Brief description for campaign cards..."
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="translations"
+                  render={() => (
+                    <FormItem>
                       <FormMessage />
                     </FormItem>
                   )}

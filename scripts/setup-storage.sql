@@ -1,12 +1,13 @@
 -- Storage Policies for images bucket
 -- Run this in Supabase SQL Editor after creating the 'images' bucket
+-- Safe to re-run: drops existing policies first, then recreates them.
 
--- Allow public read access
+DROP POLICY IF EXISTS "Public can read images" ON storage.objects;
 CREATE POLICY "Public can read images"
 ON storage.objects FOR SELECT
 USING (bucket_id = 'images');
 
--- Allow authenticated admins to upload
+DROP POLICY IF EXISTS "Admins can upload images" ON storage.objects;
 CREATE POLICY "Admins can upload images"
 ON storage.objects FOR INSERT
 WITH CHECK (
@@ -17,7 +18,7 @@ WITH CHECK (
   )
 );
 
--- Allow authenticated admins to delete
+DROP POLICY IF EXISTS "Admins can delete images" ON storage.objects;
 CREATE POLICY "Admins can delete images"
 ON storage.objects FOR DELETE
 USING (
@@ -28,7 +29,7 @@ USING (
   )
 );
 
--- Allow authenticated admins to update
+DROP POLICY IF EXISTS "Admins can update images" ON storage.objects;
 CREATE POLICY "Admins can update images"
 ON storage.objects FOR UPDATE
 USING (

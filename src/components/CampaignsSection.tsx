@@ -124,6 +124,9 @@ const CampaignsSection = ({ campaigns }: CampaignsSectionProps) => {
             {displayCampaigns.map((campaign) => {
               const progress = (campaign.raised / campaign.goal) * 100;
               const imageSrc = campaign.image || child1;
+              const hasSlug = campaign.slug != null && campaign.slug !== "";
+              const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(campaign.id));
+              const campaignHref = hasSlug || isUuid ? `/campaigns/${campaign.slug || campaign.id}` : "/campaigns";
 
               return (
                 <div key={campaign.id} className="w-[350px] md:w-[450px] shrink-0">
@@ -188,8 +191,8 @@ const CampaignsSection = ({ campaigns }: CampaignsSectionProps) => {
                         </span>
                       </div>
 
-                      {/* CTA */}
-                      <Link href={`/campaigns/${campaign.slug || campaign.id}`} className="mt-auto">
+                      {/* CTA: detail page when we have slug or UUID from API; fallback campaigns link to list */}
+                      <Link href={campaignHref} className="mt-auto">
                         <Button variant="gradient" className="w-full rounded-full">
                           {t("campaigns.support")} {campaign.name.split("'")[0]}
                           <ArrowRight className="ml-2 w-4 h-4" />

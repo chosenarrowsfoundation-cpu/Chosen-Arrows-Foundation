@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Heart, Calendar, Users, Target, Share2 } from "lucide-react";
 import type { StaticImageData } from "next/image";
+import fallbackCampaignImage from "@/assets/child-1.jpg";
 
 interface CampaignDetailClientProps {
   campaign: {
@@ -41,7 +42,7 @@ export default function CampaignDetailClient({ campaign }: CampaignDetailClientP
                 {/* Hero Image */}
                 <div className="relative h-96 rounded-2xl overflow-hidden">
                   <Image
-                    src={campaign.image}
+                    src={campaign.image || fallbackCampaignImage}
                     alt={campaign.child}
                     fill
                     priority
