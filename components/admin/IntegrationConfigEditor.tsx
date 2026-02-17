@@ -29,7 +29,7 @@ const keyLabels: Record<string, { label: string; placeholder: string; secret?: b
   [INTEGRATION_KEYS.resend_api_key]: { label: 'Resend API Key', placeholder: 're_...', secret: true },
   [INTEGRATION_KEYS.resend_from_domain]: { label: 'Resend From Domain', placeholder: 'onboarding@resend.dev' },
   [INTEGRATION_KEYS.resend_from_name]: { label: 'Resend From Name', placeholder: 'Chosen Arrows Foundation' },
-  [INTEGRATION_KEYS.mentor_notification_email]: { label: 'Mentor Notification Email', placeholder: 'info@chosenarrows.org' },
+  [INTEGRATION_KEYS.mentor_notification_email]: { label: 'Mentor Notification Email', placeholder: 'chosenarrowsfoundation@gmail.com' },
 }
 
 export default function IntegrationConfigEditor({ initialConfig }: IntegrationConfigEditorProps) {
