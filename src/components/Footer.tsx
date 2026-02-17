@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 
 const Footer = () => {
   const { t } = useTranslation();
-  const [contactInfo, setContactInfo] = useState<{ email?: string; phone?: string; address?: string } | null>(null);
+  const [contactInfo, setContactInfo] = useState<{ email?: string; emails?: string[]; phone?: string; address?: string } | null>(null);
   const [socialLinks, setSocialLinks] = useState<{ facebook?: string; twitter?: string; instagram?: string; linkedin?: string } | null>(null);
 
   useEffect(() => {
@@ -53,7 +53,7 @@ const Footer = () => {
     { icon: Linkedin, href: socialLinks?.linkedin || "https://www.linkedin.com/company/chosen-arrows-foundation", label: "LinkedIn" },
   ];
 
-  const email = contactInfo?.email || "ChosenArrowsFoundation@gmail.com";
+  const email = contactInfo?.email || contactInfo?.emails?.[0] || "chosenarrowsfoundation@gmail.com";
 
   return (
     <footer className="bg-gradient-to-b from-white to-mint-50/30 dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900 dark:via-[#11111b] dark:to-black border-t border-mint-200/50 dark:border-white/5">

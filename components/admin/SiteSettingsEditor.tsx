@@ -112,9 +112,9 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
         transparency: '100%',
       },
       contact_info: initialSettings.contact_info || {
-        emails: ['info@chosenarrows.org', 'support@chosenarrows.org'],
-        phone: '+1 (555) 123-4567',
-        address: '123 Hope Street\nCommunity Center\nCity, State 12345',
+        emails: ['info@chosenarrowsfoundation.org', 'support@chosenarrowsfoundation.org'],
+        phone: '0798 213 309',
+        address: 'Nanyuki, Marura Block 3\nSweet Water Road',
         officeHours: {
           monday: 'Monday - Friday: 9:00 AM - 5:00 PM',
           saturday: 'Saturday: 10:00 AM - 2:00 PM',
@@ -544,7 +544,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                         <Textarea
                           {...field}
                           className="min-h-20"
-                          placeholder="123 Hope Street&#10;Community Center&#10;City, State 12345"
+                          placeholder="Nanyuki, Marura Block 3&#10;Sweet Water Road"
                         />
                       </FormControl>
                       <FormMessage />

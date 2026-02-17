@@ -31,9 +31,9 @@ async function seedSettings() {
       .upsert({
         setting_key: 'contact_info',
         setting_value: {
-          email: "ChosenArrowsFoundation@gmail.com",
-          phone: "+254-XXX-XXXXXX",
-          address: "Nairobi, Kenya"
+          emails: ["info@chosenarrowsfoundation.org", "support@chosenarrowsfoundation.org"],
+          phone: "0798 213 309",
+          address: "Nanyuki, Marura Block 3\nSweet Water Road"
         },
         description: 'Contact information displayed in footer'
       }, { onConflict: 'setting_key' })

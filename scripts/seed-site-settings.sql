@@ -4,9 +4,9 @@
 INSERT INTO site_settings (setting_key, setting_value, description)
 VALUES
   ('contact_info', '{
-    "email": "ChosenArrowsFoundation@gmail.com",
-    "phone": "+254-XXX-XXXXXX",
-    "address": "Nairobi, Kenya"
+    "emails": ["info@chosenarrowsfoundation.org", "support@chosenarrowsfoundation.org"],
+    "phone": "0798 213 309",
+    "address": "Nanyuki, Marura Block 3\nSweet Water Road"
   }'::jsonb, 'Contact information displayed in footer'),
   ('social_links', '{
     "facebook": "https://facebook.com/chosenarrowsfoundation",

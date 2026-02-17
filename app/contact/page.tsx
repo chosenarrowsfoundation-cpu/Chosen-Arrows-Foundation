@@ -45,8 +45,12 @@ export default function ContactPage() {
                         </div>
                         <div>
                           <h3 className="font-semibold mb-1">Email</h3>
-                          <p className="text-sm text-muted-foreground">info@chosenarrows.org</p>
-                          <p className="text-sm text-muted-foreground">support@chosenarrows.org</p>
+                          <p className="text-sm text-muted-foreground">
+                            <a href="mailto:info@chosenarrowsfoundation.org" className="text-primary hover:underline">info@chosenarrowsfoundation.org</a>
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            <a href="mailto:support@chosenarrowsfoundation.org" className="text-primary hover:underline">support@chosenarrowsfoundation.org</a>
+                          </p>
                         </div>
                       </div>
 
@@ -56,8 +60,10 @@ export default function ContactPage() {
                         </div>
                         <div>
                           <h3 className="font-semibold mb-1">Phone</h3>
-                          <p className="text-sm text-muted-foreground">+1 (555) 123-4567</p>
-                          <p className="text-sm text-muted-foreground">Mon-Fri 9am-5pm EST</p>
+                          <p className="text-sm text-muted-foreground">
+                            <a href="tel:+254798213309" className="text-primary hover:underline">0798 213 309</a>
+                          </p>
+                          <p className="text-sm text-muted-foreground">Mon-Fri 9am-5pm EAT</p>
                         </div>
                       </div>
 
@@ -68,9 +74,8 @@ export default function ContactPage() {
                         <div>
                           <h3 className="font-semibold mb-1">Office</h3>
                           <p className="text-sm text-muted-foreground">
-                            123 Hope Street<br />
-                            Community Center<br />
-                            City, State 12345
+                            Nanyuki, Marura Block 3<br />
+                            Sweet Water Road
                           </p>
                         </div>
                       </div>
