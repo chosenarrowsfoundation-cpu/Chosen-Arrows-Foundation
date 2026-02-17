@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Upload, Search, Trash2, Copy, Check } from 'lucide-react'
+import { Upload, Search, Trash2 } from 'lucide-react'
 import { uploadImage } from '@/app/actions/media/upload-image'
 import { deleteImage } from '@/app/actions/media/delete-image'
 import { toast } from 'sonner'
@@ -47,7 +47,6 @@ export default function MediaLibrary({ initialImages }: MediaLibraryProps) {
   const [selectedFolder, setSelectedFolder] = useState<string>('all')
   const [isUploading, setIsUploading] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState<string | null>(null)
-  const [copiedUrl, setCopiedUrl] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const folders = [
@@ -94,13 +93,6 @@ export default function MediaLibrary({ initialImages }: MediaLibraryProps) {
         fileInputRef.current.value = ''
       }
     }
-  }
-
-  const handleCopyUrl = async (url: string) => {
-    await navigator.clipboard.writeText(url)
-    setCopiedUrl(url)
-    toast.success('URL copied to clipboard')
-    setTimeout(() => setCopiedUrl(null), 2000)
   }
 
   const handleDelete = async (path: string) => {
@@ -193,7 +185,7 @@ export default function MediaLibrary({ initialImages }: MediaLibraryProps) {
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {filteredImages.map((image) => (
-            <Card key={image.path} className="group relative overflow-hidden">
+            <Card key={image.path} className="overflow-hidden">
               <div className="relative aspect-square">
                 <Image
                   src={image.url}
@@ -201,28 +193,6 @@ export default function MediaLibrary({ initialImages }: MediaLibraryProps) {
                   fill
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="secondary"
-                    onClick={() => handleCopyUrl(image.url)}
-                  >
-                    {copiedUrl === image.url ? (
-                      <Check className="h-4 w-4" />
-                    ) : (
-                      <Copy className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => setShowDeleteDialog(image.path)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
                 {image.folder && (
                   <Badge className="absolute top-2 left-2 text-xs">
                     {image.folder}
@@ -230,12 +200,26 @@ export default function MediaLibrary({ initialImages }: MediaLibraryProps) {
                 )}
               </div>
               <CardContent className="p-3">
-                <p className="text-xs font-medium truncate" title={image.name}>
-                  {image.name}
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  {formatFileSize(image.size)}
-                </p>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-medium truncate" title={image.name}>
+                      {image.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatFileSize(image.size)}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={() => setShowDeleteDialog(image.path)}
+                    aria-label="Delete image"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}
