@@ -15,4 +15,5 @@ export const INTEGRATION_KEYS = {
   resend_from_domain: 'resend_from_domain',
   resend_from_name: 'resend_from_name',
   mentor_notification_email: 'mentor_notification_email',
+  contact_form_email: 'contact_form_email',
 } as const

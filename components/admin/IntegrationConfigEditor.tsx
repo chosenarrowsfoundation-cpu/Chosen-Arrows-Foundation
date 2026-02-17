@@ -30,6 +30,7 @@ const keyLabels: Record<string, { label: string; placeholder: string; secret?: b
   [INTEGRATION_KEYS.resend_from_domain]: { label: 'Resend From Domain', placeholder: 'onboarding@resend.dev' },
   [INTEGRATION_KEYS.resend_from_name]: { label: 'Resend From Name', placeholder: 'Chosen Arrows Foundation' },
   [INTEGRATION_KEYS.mentor_notification_email]: { label: 'Mentor Notification Email', placeholder: 'chosenarrowsfoundation@gmail.com' },
+  [INTEGRATION_KEYS.contact_form_email]: { label: 'Contact Form Recipient Email', placeholder: 'chosenarrowsfoundation@gmail.com' },
 }
 
 export default function IntegrationConfigEditor({ initialConfig }: IntegrationConfigEditorProps) {
@@ -242,6 +243,17 @@ export default function IntegrationConfigEditor({ initialConfig }: IntegrationCo
                       onChange={(e) => handleChange(INTEGRATION_KEYS.resend_from_name, e.target.value)}
                       placeholder={keyLabels[INTEGRATION_KEYS.resend_from_name].placeholder}
                     />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <Label htmlFor={INTEGRATION_KEYS.contact_form_email}>{keyLabels[INTEGRATION_KEYS.contact_form_email].label}</Label>
+                    <Input
+                      id={INTEGRATION_KEYS.contact_form_email}
+                      type="email"
+                      value={config[INTEGRATION_KEYS.contact_form_email] ?? ''}
+                      onChange={(e) => handleChange(INTEGRATION_KEYS.contact_form_email, e.target.value)}
+                      placeholder={keyLabels[INTEGRATION_KEYS.contact_form_email].placeholder}
+                    />
+                    <p className="text-xs text-muted-foreground">Contact form submissions are sent to this address (same Resend API key).</p>
                   </div>
                 </div>
               </div>

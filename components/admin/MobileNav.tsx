@@ -14,6 +14,7 @@ import {
   X,
   LayoutDashboard,
   Flag,
+  Users,
   Settings,
   Image as ImageIcon,
   LogOut,
@@ -38,6 +39,7 @@ interface NavItem {
 const navigation: NavItem[] = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
   { name: 'Campaigns', href: '/admin/campaigns', icon: Flag },
+  { name: 'Mentor Applications', href: '/admin/mentors', icon: Users },
   { name: 'Blog', href: '/admin/blog', icon: BookOpen },
   { name: 'Media', href: '/admin/media', icon: ImageIcon },
   { name: 'View Site', href: '/', icon: ExternalLink, external: true },

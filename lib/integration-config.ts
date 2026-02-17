@@ -30,6 +30,7 @@ const ENV_MAP: Record<string, string> = {
   [INTEGRATION_KEYS.resend_from_domain]: process.env.RESEND_FROM_DOMAIN ?? 'onboarding@resend.dev',
   [INTEGRATION_KEYS.resend_from_name]: process.env.RESEND_FROM_NAME ?? 'Chosen Arrows Foundation',
   [INTEGRATION_KEYS.mentor_notification_email]: process.env.MENTOR_NOTIFICATION_EMAIL ?? process.env.NOTIFICATION_EMAIL ?? '',
+  [INTEGRATION_KEYS.contact_form_email]: process.env.CONTACT_FORM_EMAIL ?? process.env.MENTOR_NOTIFICATION_EMAIL ?? process.env.NOTIFICATION_EMAIL ?? '',
 }
 
 const MASK = '••••••••'

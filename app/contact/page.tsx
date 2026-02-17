@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
+import { ContactForm } from "./ContactForm";
 
 export const metadata: Metadata = {
   title: "Contact Us | Chosen Arrows Foundation",
@@ -95,42 +92,7 @@ export default function ContactPage() {
 
               {/* Contact Form */}
               <div className="lg:col-span-2">
-                <Card>
-                  <CardContent className="p-8">
-                    <h2 className="text-2xl font-bold mb-6">Send Us a Message</h2>
-                    <form className="space-y-6">
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="name">Full Name</Label>
-                          <Input id="name" placeholder="John Doe" className="mt-1" />
-                        </div>
-                        <div>
-                          <Label htmlFor="email">Email</Label>
-                          <Input id="email" type="email" placeholder="john@example.com" className="mt-1" />
-                        </div>
-                      </div>
-
-                      <div>
-                        <Label htmlFor="subject">Subject</Label>
-                        <Input id="subject" placeholder="How can we help you?" className="mt-1" />
-                      </div>
-
-                      <div>
-                        <Label htmlFor="message">Message</Label>
-                        <Textarea 
-                          id="message" 
-                          placeholder="Tell us more about your inquiry..."
-                          className="mt-1 min-h-40"
-                        />
-                      </div>
-
-                      <Button variant="gradient" className="w-full h-12 rounded-full">
-                        <Send className="w-5 h-5 mr-2" />
-                        Send Message
-                      </Button>
-                    </form>
-                  </CardContent>
-                </Card>
+                <ContactForm />
               </div>
             </div>
           </div>
