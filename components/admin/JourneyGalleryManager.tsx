@@ -111,7 +111,7 @@ export default function JourneyGalleryManager({
       setEditId(null)
       router.refresh()
     } else {
-      toast.error(result.error)
+      toast.error('error' in result ? result.error : 'Update failed')
     }
   }
 
@@ -122,7 +122,7 @@ export default function JourneyGalleryManager({
       setDeleteId(null)
       router.refresh()
     } else {
-      toast.error(result.error)
+      toast.error('error' in result ? result.error : 'Failed to remove')
     }
   }
 
@@ -137,7 +137,7 @@ export default function JourneyGalleryManager({
       setItems(reordered)
       router.refresh()
     } else {
-      toast.error(result.error)
+      toast.error('error' in result ? result.error : 'Reorder failed')
     }
   }
 

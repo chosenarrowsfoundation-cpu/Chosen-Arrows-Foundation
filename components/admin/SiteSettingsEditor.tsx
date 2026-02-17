@@ -158,7 +158,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
         form.setValue('hero_video.url', result.url)
         toast.success('Video uploaded', { description: 'Click Save All Settings to apply.' })
       } else {
-        toast.error('Upload failed', { description: result.error })
+        toast.error('Upload failed', { description: 'error' in result ? result.error : 'Please try again.' })
       }
     } catch (err) {
       toast.error('Upload failed', { description: 'Please try again.' })
