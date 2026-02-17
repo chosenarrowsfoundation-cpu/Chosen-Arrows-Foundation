@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Upload, Search, Trash2 } from 'lucide-react'
+import { Upload, Search, Trash2, ImageOff } from 'lucide-react'
 import { uploadImage } from '@/app/actions/media/upload-image'
 import { deleteImage } from '@/app/actions/media/delete-image'
 import { toast } from 'sonner'
@@ -47,7 +47,12 @@ export default function MediaLibrary({ initialImages }: MediaLibraryProps) {
   const [selectedFolder, setSelectedFolder] = useState<string>('all')
   const [isUploading, setIsUploading] = useState(false)
   const [showDeleteDialog, setShowDeleteDialog] = useState<string | null>(null)
+  const [failedImagePaths, setFailedImagePaths] = useState<Set<string>>(new Set())
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const markImageFailed = (path: string) => {
+    setFailedImagePaths((prev) => new Set(prev).add(path))
+  }
 
   const folders = [
     { value: 'all', label: 'All Folders' },
@@ -100,11 +105,27 @@ export default function MediaLibrary({ initialImages }: MediaLibraryProps) {
     if (result.success) {
       toast.success('Image deleted')
       setImages(prev => prev.filter(img => img.path !== path))
+      setFailedImagePaths((prev) => {
+        const next = new Set(prev)
+        next.delete(path)
+        return next
+      })
       setShowDeleteDialog(null)
     } else {
-      toast.error('Failed to delete', {
-        description: (result as { success: false; error: string }).error,
-      })
+      // File may already be gone (orphan entry) — remove from list anyway
+      const err = (result as { success: false; error: string }).error
+      if (err.toLowerCase().includes('not found') || err.toLowerCase().includes('object not found')) {
+        setImages(prev => prev.filter(img => img.path !== path))
+        setFailedImagePaths((prev) => {
+          const next = new Set(prev)
+          next.delete(path)
+          return next
+        })
+        setShowDeleteDialog(null)
+        toast.success('Removed orphan entry')
+      } else {
+        toast.error('Failed to delete', { description: err })
+      }
     }
   }
 
@@ -186,15 +207,23 @@ export default function MediaLibrary({ initialImages }: MediaLibraryProps) {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
           {filteredImages.map((image) => (
             <Card key={image.path} className="overflow-hidden">
-              <div className="relative aspect-square">
-                <Image
-                  src={image.url}
-                  alt={image.name}
-                  fill
-                  className="object-cover"
-                />
+              <div className="relative aspect-square bg-muted">
+                {failedImagePaths.has(image.path) ? (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-muted-foreground">
+                    <ImageOff className="h-10 w-10" />
+                    <span className="text-xs">Image unavailable</span>
+                  </div>
+                ) : (
+                  <Image
+                    src={image.url}
+                    alt={image.name}
+                    fill
+                    className="object-cover"
+                    onError={() => markImageFailed(image.path)}
+                  />
+                )}
                 {image.folder && (
-                  <Badge className="absolute top-2 left-2 text-xs">
+                  <Badge className="absolute top-2 left-2 text-xs z-10">
                     {image.folder}
                   </Badge>
                 )}
