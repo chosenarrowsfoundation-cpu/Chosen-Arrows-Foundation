@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Target, Sparkles, ShieldCheck, FileSearch, BarChart3 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import CTASection from "@/components/CTASection";
+import { getJourneyGallery } from "@/app/actions/journey/get-journey-gallery";
 
 export const metadata: Metadata = {
   title: "About Us | Chosen Arrows Foundation",
@@ -15,19 +16,8 @@ export const metadata: Metadata = {
   },
 };
 
-// Image gallery data - each image used only once
-const galleryImages = [
-  { src: "/about/Image with the kids .jpeg", alt: "Our children together", span: "col-span-2 row-span-2" },
-  { src: "/about/Winnie's image with a kid .jpeg", alt: "One-on-one mentorship", span: "col-span-1 row-span-1" },
-  { src: "/about/Entre image.jpeg", alt: "Welcome to our community", span: "col-span-1 row-span-1" },
-  { src: "/about/Image 1.jpeg", alt: "Making a difference", span: "col-span-1 row-span-1" },
-  { src: "/about/Image 2.jpeg", alt: "Growing stronger", span: "col-span-1 row-span-1" },
-  { src: "/about/Banner kind image.jpeg", alt: "Community impact", span: "col-span-2 row-span-1" },
-  { src: "/about/Image 3.jpeg", alt: "Hope for tomorrow", span: "col-span-1 row-span-1" },
-  { src: "/about/Winnie image with a kid 2.jpeg", alt: "Building futures together", span: "col-span-1 row-span-1" },
-];
-
-export default function AboutPage() {
+export default async function AboutPage() {
+  const galleryImages = await getJourneyGallery();
   return (
     <main className="pt-24 pb-20">
         {/* Hero Section */}
@@ -170,11 +160,11 @@ export default function AboutPage() {
               <h2 className="text-3xl font-bold text-center mb-10">
                 Our <span className="text-taffy-500">Journey</span> in Pictures
               </h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[150px] md:auto-rows-[180px]">
-                {galleryImages.map((image, index) => (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 auto-rows-[140px] md:auto-rows-[160px] grid-flow-dense">
+                {galleryImages.map((image) => (
                   <div
-                    key={index}
-                    className={`relative overflow-hidden rounded-xl group ${image.span}`}
+                    key={image.id}
+                    className={`relative overflow-hidden rounded-lg md:rounded-xl group ${image.span}`}
                   >
                     <Image
                       src={image.src}

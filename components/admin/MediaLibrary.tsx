@@ -54,6 +54,7 @@ export default function MediaLibrary({ initialImages }: MediaLibraryProps) {
     { value: 'all', label: 'All Folders' },
     { value: 'campaigns', label: 'Campaigns' },
     { value: 'content', label: 'Content' },
+    { value: 'journey', label: 'Journey (About page)' },
   ]
 
   const filteredImages = images.filter(img => {
