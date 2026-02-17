@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { uploadVideo } from '@/app/actions/media/upload-video'
 import {
   Form,
   FormControl,
@@ -19,7 +20,7 @@ import {
 } from '@/components/ui/form'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { toast } from 'sonner'
-import { Loader2, Save } from 'lucide-react'
+import { Loader2, Save, Upload, Video } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { updateMultipleSettings } from '@/app/actions/settings/update-settings'
 
@@ -28,6 +29,10 @@ const settingsSchema = z.object({
     childrenSupported: z.number().min(0),
     activeMentors: z.number().min(0),
     fundsRaised: z.number().min(0),
+  }).optional(),
+  hero_video: z.object({
+    url: z.string().optional(),
+    posterUrl: z.string().optional(),
   }).optional(),
   impact_stats: z.array(z.object({
     value: z.string(),
@@ -81,8 +86,12 @@ interface SiteSettingsEditorProps {
   initialSettings: Record<string, any>
 }
 
+const DEFAULT_HERO_VIDEO_URL = 'https://videos.pexels.com/video-files/3209828/3209828-uhd_2560_1440_25fps.mp4'
+
 export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEditorProps) {
   const [isSaving, setIsSaving] = useState(false)
+  const [isUploadingVideo, setIsUploadingVideo] = useState(false)
+  const videoInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
@@ -91,6 +100,10 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
         childrenSupported: 45,
         activeMentors: 8,
         fundsRaised: 15000,
+      },
+      hero_video: initialSettings.hero_video || {
+        url: '',
+        posterUrl: '',
       },
       impact_stats: initialSettings.impact_stats || [],
       community_stats: initialSettings.community_stats || {
@@ -135,6 +148,26 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
     },
   })
 
+  const handleVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setIsUploadingVideo(true)
+    try {
+      const result = await uploadVideo(file, 'hero')
+      if (result.success) {
+        form.setValue('hero_video.url', result.url)
+        toast.success('Video uploaded', { description: 'Click Save All Settings to apply.' })
+      } else {
+        toast.error('Upload failed', { description: result.error })
+      }
+    } catch (err) {
+      toast.error('Upload failed', { description: 'Please try again.' })
+    } finally {
+      setIsUploadingVideo(false)
+      if (videoInputRef.current) videoInputRef.current.value = ''
+    }
+  }
+
   const onSubmit = async (data: SettingsFormValues) => {
     setIsSaving(true)
 
@@ -146,6 +179,14 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
           key: 'hero_stats',
           value: data.hero_stats,
           description: 'Hero section statistics',
+        })
+      }
+
+      if (data.hero_video) {
+        settingsToUpdate.push({
+          key: 'hero_video',
+          value: data.hero_video,
+          description: 'Hero section background video',
         })
       }
 
@@ -229,9 +270,8 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <Tabs defaultValue="hero" className="w-full">
-              <TabsList className="grid w-full grid-cols-7">
+              <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="hero">Hero Stats</TabsTrigger>
-                <TabsTrigger value="impact">Impact Stats</TabsTrigger>
                 <TabsTrigger value="community">Community Stats</TabsTrigger>
                 <TabsTrigger value="testimonials">Testimonials</TabsTrigger>
                 <TabsTrigger value="contact">Contact Info</TabsTrigger>
@@ -241,6 +281,88 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
 
               {/* Hero Stats */}
               <TabsContent value="hero" className="space-y-4 mt-6">
+                {/* Hero Background Video */}
+                <div className="rounded-lg border border-border p-4 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Video className="h-5 w-5" />
+                    <h4 className="font-medium">Hero Background Video</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Upload a video or paste a URL. Used as the homepage hero section background. MP4 or WebM, max 50MB.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <FormField
+                      control={form.control}
+                      name="hero_video.url"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>Video URL</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              value={field.value || ''}
+                              onChange={(e) => field.onChange(e.target.value)}
+                              placeholder={DEFAULT_HERO_VIDEO_URL}
+                            />
+                          </FormControl>
+                          <p className="text-xs text-muted-foreground">
+                            Leave empty to use the default video, or paste an external URL.
+                          </p>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex flex-col justify-end gap-2">
+                      <input
+                        ref={videoInputRef}
+                        type="file"
+                        accept="video/mp4,video/webm"
+                        className="hidden"
+                        onChange={handleVideoUpload}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => videoInputRef.current?.click()}
+                        disabled={isUploadingVideo}
+                      >
+                        {isUploadingVideo ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="h-4 w-4 mr-2" />
+                            Upload Video
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="hero_video.posterUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Poster Image URL (optional)</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(e.target.value)}
+                            placeholder="/hero-poster.jpg"
+                          />
+                        </FormControl>
+                        <p className="text-xs text-muted-foreground">
+                          Image shown before the video loads.
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <div className="grid gap-4 md:grid-cols-3">
                   <FormField
                     control={form.control}
@@ -298,13 +420,6 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                       </FormItem>
                     )}
                   />
-                </div>
-              </TabsContent>
-
-              {/* Impact Stats */}
-              <TabsContent value="impact" className="space-y-4 mt-6">
-                <div className="text-sm text-muted-foreground mb-4">
-                  Impact statistics are managed through the Content Sections editor.
                 </div>
               </TabsContent>
 

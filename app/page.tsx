@@ -60,7 +60,7 @@ export default async function HomePage() {
   const language = await getServerLanguage();
   
   // Fetch all content in parallel
-  const [heroContent, valuesContent, impactContent, communityContent, ctaContent, campaignsRaw, testimonials, heroStats] = await Promise.all([
+  const [heroContent, valuesContent, impactContent, communityContent, ctaContent, campaignsRaw, testimonials, heroStats, heroVideo] = await Promise.all([
     getContent('hero', language).catch(() => null),
     getContent('values', language).catch(() => null),
     getContent('impact', language).catch(() => null),
@@ -69,6 +69,7 @@ export default async function HomePage() {
     getCampaigns(language, { limit: 5, status: 'active' }).catch(() => []),
     getGoogleTestimonials(language).catch(() => []),
     getSetting('hero_stats').catch(() => null),
+    getSetting('hero_video').catch(() => null),
   ]);
 
   // Transform campaigns to match CampaignsSection expected format
@@ -96,10 +97,12 @@ export default async function HomePage() {
     }
   } : heroContent;
 
+  const heroVideoConfig = heroVideo as { url?: string; posterUrl?: string } | null
+
   return (
     <main className="bg-background text-foreground">
       {/* Scroll-locked Hero Section */}
-      <ScrollLockHero content={heroContentWithStats} />
+      <ScrollLockHero content={heroContentWithStats} videoUrl={heroVideoConfig?.url} posterUrl={heroVideoConfig?.posterUrl} />
       <ValuesSection content={valuesContent} />
       <ImpactSection content={impactContent} />
       <CampaignsSection campaigns={campaigns} />

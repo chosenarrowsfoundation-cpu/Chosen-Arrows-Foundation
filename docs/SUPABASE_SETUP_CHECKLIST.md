@@ -86,6 +86,8 @@ Follow these steps in order to set up your Supabase backend.
   - ✅ content_audit_log
   - ✅ page_metadata
   - ✅ static_image_mapping
+- Run **004_integration_config.sql** the same way (SQL Editor → paste → Run) so Admin → Settings → API & Integrations can store keys:
+  - ✅ integration_config
 
 **✅ Checkpoint:** Database schema created
 

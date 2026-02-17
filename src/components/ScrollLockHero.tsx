@@ -33,7 +33,18 @@ const formatCurrency = (value: number | string | undefined, fallback: string) =>
   return Number.isFinite(asNumber) ? `$${asNumber.toLocaleString()}` : String(value);
 };
 
-const ScrollLockHero = ({ content }: { content?: HeroContent }) => {
+const DEFAULT_VIDEO_URL = 'https://videos.pexels.com/video-files/3209828/3209828-uhd_2560_1440_25fps.mp4'
+const DEFAULT_POSTER = '/hero-poster.jpg'
+
+const ScrollLockHero = ({
+  content,
+  videoUrl,
+  posterUrl,
+}: {
+  content?: HeroContent
+  videoUrl?: string | null
+  posterUrl?: string | null
+}) => {
   const { t } = useTranslation();
   const title = content?.title ?? t("hero.title");
   const [isLocked, setIsLocked] = useState(true);
@@ -165,11 +176,11 @@ const ScrollLockHero = ({ content }: { content?: HeroContent }) => {
           loop
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
-          poster="/hero-poster.jpg"
+          poster={posterUrl || DEFAULT_POSTER}
         >
           <source
-            src="https://videos.pexels.com/video-files/3209828/3209828-uhd_2560_1440_25fps.mp4"
-            type="video/mp4"
+            src={videoUrl?.trim() || DEFAULT_VIDEO_URL}
+            type={(videoUrl?.trim() || DEFAULT_VIDEO_URL).toLowerCase().endsWith('.webm') ? 'video/webm' : 'video/mp4'}
           />
         </video>
         {/* Dark overlay for text readability */}
