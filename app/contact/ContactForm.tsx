@@ -27,7 +27,7 @@ export function ContactForm() {
                 const form = document.getElementById('contact-form') as HTMLFormElement
                 form?.reset()
               } else {
-                toast.error(result.error)
+                toast.error('error' in result ? result.error : 'Something went wrong.')
               }
             })
           }}
