@@ -60,7 +60,7 @@ export default async function HomePage() {
   const language = await getServerLanguage();
   
   // Fetch all content in parallel
-  const [heroContent, valuesContent, impactContent, communityContent, ctaContent, campaignsRaw, testimonials, heroStats, heroVideo] = await Promise.all([
+  const [heroContent, valuesContent, impactContent, communityContent, ctaContent, campaignsRaw, testimonials, heroStats, heroVideo, communityVideo] = await Promise.all([
     getContent('hero', language).catch(() => null),
     getContent('values', language).catch(() => null),
     getContent('impact', language).catch(() => null),
@@ -70,6 +70,7 @@ export default async function HomePage() {
     getGoogleTestimonials(language).catch(() => []),
     getSetting('hero_stats').catch(() => null),
     getSetting('hero_video').catch(() => null),
+    getSetting('community_video').catch(() => null),
   ]);
 
   // Transform campaigns to match CampaignsSection expected format
@@ -98,6 +99,7 @@ export default async function HomePage() {
   } : heroContent;
 
   const heroVideoConfig = heroVideo as { url?: string; posterUrl?: string } | null
+  const communityVideoConfig = communityVideo as { url?: string; posterUrl?: string } | null
 
   return (
     <main className="bg-background text-foreground">
@@ -106,7 +108,7 @@ export default async function HomePage() {
       <ValuesSection content={valuesContent} />
       <ImpactSection content={impactContent} />
       <CampaignsSection campaigns={campaigns} />
-      <CommunitySection content={communityContent} testimonials={testimonials} />
+      <CommunitySection content={communityContent} testimonials={testimonials} videoUrl={communityVideoConfig?.url} posterUrl={communityVideoConfig?.posterUrl} />
       <CTASection content={ctaContent} />
     </main>
   );

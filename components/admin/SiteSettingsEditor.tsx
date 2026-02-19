@@ -34,6 +34,10 @@ const settingsSchema = z.object({
     url: z.string().optional(),
     posterUrl: z.string().optional(),
   }).optional(),
+  community_video: z.object({
+    url: z.string().optional(),
+    posterUrl: z.string().optional(),
+  }).optional(),
   impact_stats: z.array(z.object({
     value: z.string(),
     label: z.string(),
@@ -91,7 +95,9 @@ const DEFAULT_HERO_VIDEO_URL = 'https://videos.pexels.com/video-files/3209828/32
 export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEditorProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [isUploadingVideo, setIsUploadingVideo] = useState(false)
+  const [isUploadingCommunityVideo, setIsUploadingCommunityVideo] = useState(false)
   const videoInputRef = useRef<HTMLInputElement>(null)
+  const communityVideoInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
@@ -102,6 +108,10 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
         fundsRaised: 15000,
       },
       hero_video: initialSettings.hero_video || {
+        url: '',
+        posterUrl: '',
+      },
+      community_video: initialSettings.community_video || {
         url: '',
         posterUrl: '',
       },
@@ -168,6 +178,26 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
     }
   }
 
+  const handleCommunityVideoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setIsUploadingCommunityVideo(true)
+    try {
+      const result = await uploadVideo(file, 'community')
+      if (result.success) {
+        form.setValue('community_video.url', result.url)
+        toast.success('Community video uploaded', { description: 'Click Save All Settings to apply.' })
+      } else {
+        toast.error('Upload failed', { description: 'error' in result ? result.error : 'Please try again.' })
+      }
+    } catch (err) {
+      toast.error('Upload failed', { description: 'Please try again.' })
+    } finally {
+      setIsUploadingCommunityVideo(false)
+      if (communityVideoInputRef.current) communityVideoInputRef.current.value = ''
+    }
+  }
+
   const onSubmit = async (data: SettingsFormValues) => {
     setIsSaving(true)
 
@@ -187,6 +217,14 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
           key: 'hero_video',
           value: data.hero_video,
           description: 'Hero section background video',
+        })
+      }
+
+      if (data.community_video) {
+        settingsToUpdate.push({
+          key: 'community_video',
+          value: data.community_video,
+          description: 'Community section video',
         })
       }
 
@@ -425,6 +463,88 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
 
               {/* Community Stats */}
               <TabsContent value="community" className="space-y-4 mt-6">
+                {/* Community Section Video */}
+                <div className="rounded-lg border border-border p-4 space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Video className="h-5 w-5" />
+                    <h4 className="font-medium">Community Section Video</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Upload a video or paste a URL. Shown in the community section on the homepage. MP4 or WebM, max 50MB.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <FormField
+                      control={form.control}
+                      name="community_video.url"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>Video URL</FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              value={field.value || ''}
+                              onChange={(e) => field.onChange(e.target.value)}
+                              placeholder="/hero-background.mp4"
+                            />
+                          </FormControl>
+                          <p className="text-xs text-muted-foreground">
+                            Leave empty to use the default video, or paste an external URL.
+                          </p>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex flex-col justify-end gap-2">
+                      <input
+                        ref={communityVideoInputRef}
+                        type="file"
+                        accept="video/mp4,video/webm"
+                        className="hidden"
+                        onChange={handleCommunityVideoUpload}
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => communityVideoInputRef.current?.click()}
+                        disabled={isUploadingCommunityVideo}
+                      >
+                        {isUploadingCommunityVideo ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="h-4 w-4 mr-2" />
+                            Upload Video
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="community_video.posterUrl"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Poster Image URL (optional)</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            value={field.value || ''}
+                            onChange={(e) => field.onChange(e.target.value)}
+                            placeholder="/community-poster.jpg"
+                          />
+                        </FormControl>
+                        <p className="text-xs text-muted-foreground">
+                          Image shown before the video loads.
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <div className="grid gap-4 md:grid-cols-3">
                   <FormField
                     control={form.control}

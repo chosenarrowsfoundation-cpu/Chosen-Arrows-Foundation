@@ -55,12 +55,18 @@ type Testimonial = {
   avatar_initials: string | null;
 };
 
+const DEFAULT_COMMUNITY_VIDEO = '/hero-background.mp4';
+
 const CommunitySection = ({ 
   content, 
-  testimonials: testimonialsProp 
+  testimonials: testimonialsProp,
+  videoUrl,
+  posterUrl,
 }: { 
   content?: CommunityContent;
   testimonials?: Testimonial[];
+  videoUrl?: string | null;
+  posterUrl?: string | null;
 }) => {
   const { t } = useTranslation();
   
@@ -97,9 +103,13 @@ const CommunitySection = ({
               muted
               loop
               playsInline
+              poster={posterUrl || undefined}
               className="absolute inset-0 w-full h-full object-cover"
             >
-              <source src="/hero-background.mp4" type="video/mp4" />
+              <source
+                src={videoUrl?.trim() || DEFAULT_COMMUNITY_VIDEO}
+                type={(videoUrl?.trim() || DEFAULT_COMMUNITY_VIDEO).toLowerCase().endsWith('.webm') ? 'video/webm' : 'video/mp4'}
+              />
             </video>
             <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
             <div className="absolute bottom-6 left-6 right-6">
