@@ -33,23 +33,23 @@ export default function ContactPage() {
 
         <section className="py-12">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-5xl mx-auto grid lg:grid-cols-3 gap-8">
+            <div className="max-w-6xl mx-auto grid lg:grid-cols-[minmax(400px,1fr)_2fr] gap-8">
               {/* Contact Info */}
-              <div className="space-y-6">
-                <Card>
-                  <CardContent className="p-6 space-y-6">
-                    <div className="space-y-4">
-                      <div className="flex items-start gap-4">
+              <div className="space-y-6 min-w-0">
+                <Card className="min-w-0">
+                  <CardContent className="p-6 space-y-6 min-w-0">
+                    <div className="space-y-4 min-w-0">
+                      <div className="flex items-start gap-4 min-w-0">
                         <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0">
                           <Mail className="w-5 h-5 text-white" />
                         </div>
-                        <div>
+                        <div className="min-w-0 break-words">
                           <h3 className="font-semibold mb-1">Email</h3>
-                          <p className="text-sm text-muted-foreground">
-                            <a href="mailto:info@chosenarrowsfoundation.org" className="text-primary hover:underline">info@chosenarrowsfoundation.org</a>
+                          <p className="text-sm text-muted-foreground break-words">
+                            <a href="mailto:info@chosenarrowsfoundation.org" className="text-primary hover:underline break-all">info@chosenarrowsfoundation.org</a>
                           </p>
-                          <p className="text-sm text-muted-foreground">
-                            <a href="mailto:support@chosenarrowsfoundation.org" className="text-primary hover:underline">support@chosenarrowsfoundation.org</a>
+                          <p className="text-sm text-muted-foreground break-words">
+                            <a href="mailto:support@chosenarrowsfoundation.org" className="text-primary hover:underline break-all">support@chosenarrowsfoundation.org</a>
                           </p>
                         </div>
                       </div>
@@ -83,8 +83,8 @@ export default function ContactPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
-                  <CardContent className="p-6">
+                <Card className="bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20 min-w-0">
+                  <CardContent className="p-6 min-w-0">
                     <h3 className="font-semibold mb-2">Office Hours</h3>
                     <div className="space-y-1 text-sm text-muted-foreground">
                       <p>Monday - Friday: 9:00 AM - 5:00 PM</p>
@@ -96,7 +96,7 @@ export default function ContactPage() {
               </div>
 
               {/* Contact Form */}
-              <div className="lg:col-span-2">
+              <div className="min-w-0">
                 <ContactForm />
               </div>
             </div>
