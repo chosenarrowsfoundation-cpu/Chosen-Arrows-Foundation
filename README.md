@@ -2,6 +2,8 @@
 
 A crowdfunding and community platform built with Next.js 16, Supabase, and Tailwind CSS.
 
+**Repository**: [github.com/chosenarrowsfoundation-cpu/Chosen-Arrows-Foundation](https://github.com/chosenarrowsfoundation-cpu/Chosen-Arrows-Foundation)
+
 ## Quick Start
 
 ```bash

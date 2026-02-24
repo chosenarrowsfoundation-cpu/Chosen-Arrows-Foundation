@@ -45,9 +45,9 @@ async function setupVercelEnv() {
   const supabaseUrl = await question('NEXT_PUBLIC_SUPABASE_URL (project URL): ')
   const supabaseAnonKey = await question('NEXT_PUBLIC_SUPABASE_ANON_KEY (anon/public key): ')
   const supabaseServiceKey = await question('SUPABASE_SERVICE_ROLE_KEY (service_role key): ')
-  const siteUrl = await question('NEXT_PUBLIC_SITE_URL (your Vercel domain, default: https://chosen-arrows-foundation.vercel.app): ')
+  const siteUrl = await question('NEXT_PUBLIC_SITE_URL (your Vercel domain, default: https://chosen-arrows-foundation-six.vercel.app): ')
 
-  const finalSiteUrl = siteUrl || 'https://chosen-arrows-foundation.vercel.app'
+  const finalSiteUrl = siteUrl || 'https://chosen-arrows-foundation-six.vercel.app'
 
   console.log('\n🔧 Adding environment variables to Vercel...\n')
 

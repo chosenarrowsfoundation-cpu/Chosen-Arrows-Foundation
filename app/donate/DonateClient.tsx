@@ -399,7 +399,7 @@ export default function DonateClient({
                                   customizations: {
                                     title: "Chosen Arrows Donation",
                                     description: "Donation Support",
-                                    logo: "https://chosenarrows.com/logo.png",
+                                    logo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://chosen-arrows-foundation-six.vercel.app"}/logo.png`,
                                   },
                                 }}
                               />

@@ -14,7 +14,11 @@
     "seed-settings": "tsx scripts/seed-site-settings.ts",
     "setup-vercel-env": "tsx scripts/setup-vercel-env.ts"
   },
-  "homepage": "https://chosenarrows.com",
+  "homepage": "https://chosen-arrows-foundation-six.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chosenarrowsfoundation-cpu/Chosen-Arrows-Foundation"
+  },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@paypal/react-paypal-js": "^8.9.2",

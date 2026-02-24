@@ -5,7 +5,7 @@ import { getServerLanguage } from "@/lib/i18n";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://chosenarrows.com"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://chosen-arrows-foundation-six.vercel.app"),
   title: {
     default: "Chosen Arrows Foundation",
     template: "%s | Chosen Arrows Foundation",
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://chosenarrows.com",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://chosen-arrows-foundation-six.vercel.app",
     siteName: "Chosen Arrows Foundation",
     title: "Chosen Arrows Foundation",
     description: "Empowering children and communities through education and mentorship",

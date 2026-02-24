@@ -58,7 +58,7 @@ const Footer = () => {
   return (
     <footer className="bg-gradient-to-b from-white to-mint-50/30 dark:bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] dark:from-slate-900 dark:via-[#11111b] dark:to-black border-t border-mint-200/50 dark:border-white/5">
       <div className="enterprise-container py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)] gap-8 md:gap-12">
           {/* Brand */}
           <div className="md:col-span-1">
             <Link href="/" className="flex items-center gap-3 mb-4">
@@ -134,18 +134,18 @@ const Footer = () => {
           </div>
 
           {/* Contact */}
-          <div>
+          <div className="min-w-0">
             <h4 className="text-sm font-semibold text-foreground mb-4">
               {t("footer.contactUs")}
             </h4>
             <ul className="space-y-3">
-              <li>
+              <li className="min-w-0 overflow-hidden">
                 <a
                   href={`mailto:${email}`}
-                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-150"
+                  className="grid grid-cols-[auto_minmax(0,1fr)] gap-2 items-center text-sm text-muted-foreground hover:text-foreground transition-colors duration-150"
                 >
                   <Mail className="w-4 h-4 flex-shrink-0" />
-                  <span className="break-all">{email}</span>
+                  <span className="break-all min-w-0">{email}</span>
                 </a>
               </li>
               <li className="text-sm text-muted-foreground leading-relaxed">
