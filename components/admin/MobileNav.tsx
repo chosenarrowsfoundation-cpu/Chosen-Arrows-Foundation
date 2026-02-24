@@ -20,6 +20,8 @@ import {
   LogOut,
   ExternalLink,
   BookOpen,
+  ShieldCheck,
+  LayoutTemplate,
 } from 'lucide-react'
 import { adminLogout } from '@/app/actions/auth/admin-login'
 import Image from 'next/image'
@@ -38,9 +40,11 @@ interface NavItem {
 
 const navigation: NavItem[] = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+  { name: 'Content', href: '/admin/content/sections', icon: LayoutTemplate },
   { name: 'Campaigns', href: '/admin/campaigns', icon: Flag },
   { name: 'Mentor Applications', href: '/admin/mentors', icon: Users },
   { name: 'Blog', href: '/admin/blog', icon: BookOpen },
+  { name: 'Transparency', href: '/admin/transparency', icon: ShieldCheck },
   { name: 'Media', href: '/admin/media', icon: ImageIcon },
   { name: 'View Site', href: '/', icon: ExternalLink, external: true },
 ]

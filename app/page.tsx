@@ -12,6 +12,7 @@ import { getGoogleTestimonials } from "@/app/actions/testimonials/get-google-tes
 import { getSetting } from "@/app/actions/settings/get-settings";
 import { getServerLanguage } from "@/lib/i18n";
 import { getPageMetadata } from "@/app/actions/metadata/get-page-metadata";
+import { getHeroLabels } from "@/lib/server-translations";
 
 export async function generateMetadata(): Promise<Metadata> {
   const language = await getServerLanguage();
@@ -105,11 +106,12 @@ export default async function HomePage() {
 
   const heroVideoConfig = heroVideo as { url?: string; posterUrl?: string } | null
   const communityVideoConfig = communityVideo as { url?: string; posterUrl?: string } | null
+  const heroLabels = getHeroLabels(language)
 
   return (
     <main className="bg-background text-foreground">
       {/* Scroll-locked Hero Section */}
-      <ScrollLockHero content={heroContentWithStats} videoUrl={heroVideoConfig?.url} posterUrl={heroVideoConfig?.posterUrl} />
+      <ScrollLockHero content={heroContentWithStats} labels={heroLabels} videoUrl={heroVideoConfig?.url} posterUrl={heroVideoConfig?.posterUrl} />
       <ValuesSection content={valuesContent} />
       <ImpactSection content={impactContent} />
       <CampaignsSection campaigns={campaigns} />

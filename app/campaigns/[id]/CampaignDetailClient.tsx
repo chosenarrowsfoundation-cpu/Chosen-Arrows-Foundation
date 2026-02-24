@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -27,6 +28,7 @@ interface CampaignDetailClientProps {
 }
 
 export default function CampaignDetailClient({ campaign }: CampaignDetailClientProps) {
+  const { t } = useTranslation();
   const progress =
     campaign.goal > 0
       ? Math.min(100, (campaign.raised / campaign.goal) * 100)
@@ -74,7 +76,7 @@ export default function CampaignDetailClient({ campaign }: CampaignDetailClientP
                 {/* Updates */}
                 <Card>
                   <CardContent className="p-6">
-                    <h2 className="text-2xl font-bold mb-6">Campaign Updates</h2>
+                    <h2 className="text-2xl font-bold mb-6">{t("campaignDetail.updates")}</h2>
                     <div className="space-y-4">
                       {campaign.updates.map((update, index) => (
                         <div key={index} className="border-l-2 border-primary pl-4 py-2">
@@ -104,14 +106,14 @@ export default function CampaignDetailClient({ campaign }: CampaignDetailClientP
                             <Users className="w-4 h-4" />
                           </div>
                           <div className="text-2xl font-bold">{campaign.supporters}</div>
-                          <div className="text-sm text-muted-foreground">Supporters</div>
+                          <div className="text-sm text-muted-foreground">{t("campaignDetail.supporters")}</div>
                         </div>
                         <div className="text-center p-3 rounded-lg bg-muted/50">
                           <div className="flex items-center justify-center gap-2 text-muted-foreground mb-1">
                             <Calendar className="w-4 h-4" />
                           </div>
                           <div className="text-2xl font-bold">{campaign.daysLeft}</div>
-                          <div className="text-sm text-muted-foreground">Days Left</div>
+                          <div className="text-sm text-muted-foreground">{t("campaignDetail.daysLeft")}</div>
                         </div>
                       </div>
                     </div>
@@ -119,13 +121,13 @@ export default function CampaignDetailClient({ campaign }: CampaignDetailClientP
                     <Link href={`/donate?campaign_id=${campaign.id}`}>
                       <Button variant="gradient" className="w-full h-12 text-lg rounded-full">
                         <Heart className="w-5 h-5 mr-2" fill="currentColor" />
-                        Donate Now
+                        {t("campaignDetail.donateNow")}
                       </Button>
                     </Link>
 
                     <Button variant="outline" className="w-full rounded-full">
                       <Share2 className="w-4 h-4 mr-2" />
-                      Share Campaign
+                      {t("campaignDetail.shareCampaign")}
                     </Button>
 
                     <div className="pt-4 border-t space-y-3 text-sm text-muted-foreground">

@@ -3,8 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, ChevronDown } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import Link from "next/link";
+import type { HeroLabels } from "@/lib/server-translations";
 
 type HeroContent = {
   badge?: string;
@@ -38,15 +38,25 @@ const DEFAULT_POSTER = '/hero-poster.jpg'
 
 const ScrollLockHero = ({
   content,
+  labels,
   videoUrl,
   posterUrl,
 }: {
   content?: HeroContent
+  labels?: HeroLabels
   videoUrl?: string | null
   posterUrl?: string | null
 }) => {
-  const { t } = useTranslation();
-  const title = content?.title ?? t("hero.title");
+  // Use server-provided labels to prevent hydration mismatch (server/client language can differ on first paint)
+  const badge = content?.badge ?? labels?.badge ?? "Empowering Children, Shaping Destinies";
+  const title = content?.title ?? labels?.title ?? "Every Child is an Arrow in the Hand of God";
+  const subtitle = content?.subtitle ?? labels?.subtitle ?? "We guide children toward their ordained destinies through mentorship, education, and transparent support — planting seeds of hope that will light up the world.";
+  const cta = content?.cta ?? labels?.cta ?? "Start Giving Hope";
+  const ctaMentor = content?.ctaMentor ?? labels?.ctaMentor ?? "Become a Mentor";
+  const childrenSupportedLabel = labels?.childrenSupported ?? "Children Supported";
+  const activeMentorsLabel = labels?.activeMentors ?? "Active Mentors";
+  const fundsRaisedLabel = labels?.fundsRaised ?? "Funds Raised";
+  const scrollLabel = labels?.scroll ?? "Scroll";
   const [isLocked, setIsLocked] = useState(true);
   const [hasScrolled, setHasScrolled] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
@@ -193,7 +203,7 @@ const ScrollLockHero = ({
           {/* Badge - Smaller on mobile */}
           <div className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 mb-3 md:mb-6 text-[10px] md:text-xs font-medium text-white bg-taffy-400/20 backdrop-blur-sm rounded-full border border-taffy-400/30 self-center">
             <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-taffy-400 rounded-full animate-pulse" />
-            <span>{content?.badge ?? t("hero.badge")}</span>
+            <span>{badge}</span>
           </div>
 
           {/* Main Heading - Smaller on mobile */}
@@ -203,7 +213,7 @@ const ScrollLockHero = ({
 
           {/* Subheading - Condensed on mobile */}
           <p className="mb-5 md:mb-8 text-sm md:text-lg lg:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed px-2">
-            {content?.subtitle ?? t("hero.subtitle")}
+            {subtitle}
           </p>
 
           {/* CTA Buttons - Smaller on mobile */}
@@ -214,7 +224,7 @@ const ScrollLockHero = ({
                 variant="gradient"
                 className="px-4 md:px-8 text-xs md:text-sm rounded-full h-9 md:h-11"
               >
-                {content?.cta ?? t("hero.cta")}
+                {cta}
                 <ArrowRight className="ml-1.5 md:ml-2 w-3 h-3 md:w-4 md:h-4" />
               </Button>
             </Link>
@@ -225,7 +235,7 @@ const ScrollLockHero = ({
                 className="px-4 md:px-8 text-xs md:text-sm rounded-full border-mint-300/50 bg-mint-300/10 hover:bg-mint-300/20 hover:border-mint-300/70 h-9 md:h-11"
               >
                 <Users className="mr-1.5 md:mr-2 w-3 h-3 md:w-4 md:h-4" />
-                <span className="hidden sm:inline">{content?.ctaMentor ?? t("hero.ctaMentor")}</span>
+                <span className="hidden sm:inline">{ctaMentor}</span>
                 <span className="sm:hidden">Mentor</span>
               </Button>
             </Link>
@@ -238,7 +248,7 @@ const ScrollLockHero = ({
                 {formatStat(content?.stats?.childrenSupported, "45")}
               </div>
               <div className="text-[10px] sm:text-xs md:text-sm text-white/70 font-medium mt-0.5 md:mt-1 leading-tight">
-                {t("hero.childrenSupported")}
+                {childrenSupportedLabel}
               </div>
             </div>
             <div className="text-center">
@@ -246,7 +256,7 @@ const ScrollLockHero = ({
                 {formatStat(content?.stats?.activeMentors, "8")}
               </div>
               <div className="text-[10px] sm:text-xs md:text-sm text-white/70 font-medium mt-0.5 md:mt-1 leading-tight">
-                {t("hero.activeMentors")}
+                {activeMentorsLabel}
               </div>
             </div>
             <div className="text-center">
@@ -254,7 +264,7 @@ const ScrollLockHero = ({
                 {formatCurrency(content?.stats?.fundsRaised, "$15K")}
               </div>
               <div className="text-[10px] sm:text-xs md:text-sm text-white/70 font-medium mt-0.5 md:mt-1 leading-tight">
-                {t("hero.fundsRaised")}
+                {fundsRaisedLabel}
               </div>
             </div>
           </div>
@@ -272,12 +282,12 @@ const ScrollLockHero = ({
             ? "text-foreground/40 scale-90" 
             : "text-foreground/80 hover:text-foreground scale-100"
         }`}
-        aria-label="Click to scroll to content"
+        aria-label={scrollLabel}
       >
         <span className={`text-[8px] md:text-xs font-medium tracking-wider uppercase transition-opacity ${
           hasScrolled ? "opacity-50" : "opacity-100"
         }`}>
-          {isLocked ? "Scroll" : "Scroll"}
+          {scrollLabel}
         </span>
         <div className={`relative w-4 h-6 md:w-6 md:h-9 rounded-full border-2 border-current flex items-start justify-center p-0.5 md:p-1 transition-all ${
           isLocked && !hasScrolled ? "animate-pulse-subtle" : ""

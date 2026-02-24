@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useTranslation } from 'react-i18next'
 import { UnifiedCampaignCard } from '@/components/ui/campaign-card'
 import { Pagination } from '@/components/ui/pagination'
 
@@ -26,6 +27,7 @@ interface CampaignsWithPaginationProps {
 }
 
 export default function CampaignsWithPagination({ campaigns }: CampaignsWithPaginationProps) {
+  const { t } = useTranslation()
   const searchParams = useSearchParams()
   const [currentPage, setCurrentPage] = useState(1)
   const [paginatedCampaigns, setPaginatedCampaigns] = useState<CampaignWithPagination[]>([])
@@ -53,16 +55,26 @@ export default function CampaignsWithPagination({ campaigns }: CampaignsWithPagi
   const totalPages = Math.ceil(campaigns.length / CAMPAIGNS_PER_PAGE)
 
   if (totalPages === 0 && campaigns.length === 0) {
+    const pageTitle = t("campaigns.pageTitle");
     return (
       <main className="pt-24 pb-20">
         <section className="py-12 bg-gradient-to-b from-primary/5 to-background">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto text-center space-y-4">
               <h1 className="text-4xl md:text-5xl font-bold">
-                Active <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Campaigns</span>
+                {pageTitle.includes(" ") ? (
+                  <>
+                    {pageTitle.split(" ").slice(0, -1).join(" ")}{" "}
+                    <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                      {pageTitle.split(" ").slice(-1)[0]}
+                    </span>
+                  </>
+                ) : (
+                  pageTitle
+                )}
               </h1>
               <p className="text-lg md:text-xl text-muted-foreground">
-                No active campaigns at the moment. Check back soon!
+                {t("campaigns.noCampaigns")}
               </p>
             </div>
           </div>
@@ -78,10 +90,19 @@ export default function CampaignsWithPagination({ campaigns }: CampaignsWithPagi
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center space-y-4">
             <h1 className="text-4xl md:text-5xl font-bold">
-              Active <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Campaigns</span>
+              {t("campaigns.pageTitle").includes(" ") ? (
+                <>
+                  {t("campaigns.pageTitle").split(" ").slice(0, -1).join(" ")}{" "}
+                  <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    {t("campaigns.pageTitle").split(" ").slice(-1)[0]}
+                  </span>
+                </>
+              ) : (
+                t("campaigns.pageTitle")
+              )}
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground">
-              Every child has a story. Every campaign is a step toward their divine destiny.
+              {t("campaigns.pageSubtitle")}
             </p>
           </div>
         </div>
@@ -95,7 +116,7 @@ export default function CampaignsWithPagination({ campaigns }: CampaignsWithPagi
               <UnifiedCampaignCard
                 key={campaign.id}
                 campaign={campaign}
-                buttonText={`Sponsor ${campaign.child.split(',')[0]}`}
+                buttonText={t("campaigns.sponsorChildName", { name: campaign.child.split(',')[0] || campaign.child })}
                 variant="campaigns"
                 showCategory={true}
                 imageHeight="h-64"

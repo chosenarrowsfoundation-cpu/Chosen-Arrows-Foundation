@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useFormStatus } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -13,6 +14,7 @@ import { submitMentorApplication } from '@/app/actions/mentorship/submit-applica
 
 function SubmitButton() {
   const { pending } = useFormStatus()
+  const { t } = useTranslation()
 
   return (
     <Button
@@ -24,12 +26,12 @@ function SubmitButton() {
       {pending ? (
         <>
           <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-          Submitting...
+          {t('mentorship.submitting')}
         </>
       ) : (
         <>
           <CheckCircle className="w-5 h-5 mr-2" />
-          Submit Application
+          {t('mentorship.submit')}
         </>
       )}
     </Button>
@@ -37,6 +39,7 @@ function SubmitButton() {
 }
 
 export default function MentorshipForm() {
+  const { t } = useTranslation()
   const [key, setKey] = useState(0)
 
   async function handleSubmit(formData: FormData) {
@@ -59,30 +62,30 @@ export default function MentorshipForm() {
     <Card>
       <CardContent className="p-8 space-y-6">
         <div className="text-center space-y-2 mb-8">
-          <h2 className="text-3xl font-bold">Join Our Mentor Program</h2>
+          <h2 className="text-3xl font-bold">{t('mentorship.joinProgram')}</h2>
           <p className="text-muted-foreground">
-            Fill out the form below to begin your mentorship journey
+            {t('mentorship.formSubtitle')}
           </p>
         </div>
 
         <form key={key} action={handleSubmit} className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="firstName">First Name</Label>
+              <Label htmlFor="firstName">{t('mentorship.firstName')}</Label>
               <Input
                 id="firstName"
                 name="firstName"
-                placeholder="John"
+                placeholder={t('contact.placeholderName').split(' ')[0]}
                 className="mt-1"
                 required
               />
             </div>
             <div>
-              <Label htmlFor="lastName">Last Name</Label>
+              <Label htmlFor="lastName">{t('mentorship.lastName')}</Label>
               <Input
                 id="lastName"
                 name="lastName"
-                placeholder="Doe"
+                placeholder={t('contact.placeholderName').split(' ').slice(-1)[0] || ''}
                 className="mt-1"
                 required
               />
@@ -90,19 +93,19 @@ export default function MentorshipForm() {
           </div>
 
           <div>
-            <Label htmlFor="email">Email Address</Label>
+            <Label htmlFor="email">{t('mentorship.emailAddress')}</Label>
             <Input
               id="email"
               name="email"
               type="email"
-              placeholder="john@example.com"
+              placeholder={t('contact.placeholderEmail')}
               className="mt-1"
               required
             />
           </div>
 
           <div>
-            <Label htmlFor="phone">Phone Number</Label>
+            <Label htmlFor="phone">{t('mentorship.phoneNumber')}</Label>
             <Input
               id="phone"
               name="phone"
@@ -113,41 +116,41 @@ export default function MentorshipForm() {
           </div>
 
           <div>
-            <Label htmlFor="occupation">Occupation</Label>
+            <Label htmlFor="occupation">{t('mentorship.occupation')}</Label>
             <Input
               id="occupation"
               name="occupation"
-              placeholder="Your profession"
+              placeholder={t('mentorship.occupationPlaceholder')}
               className="mt-1"
             />
           </div>
 
           <div>
-            <Label htmlFor="whyMentor">Why do you want to be a mentor?</Label>
+            <Label htmlFor="whyMentor">{t('mentorship.whyMentor')}</Label>
             <Textarea
               id="whyMentor"
               name="whyMentor"
-              placeholder="Share your motivation and what you hope to bring to the mentorship..."
+              placeholder={t('mentorship.whyPlaceholder')}
               className="mt-1 min-h-32"
             />
           </div>
 
           <div>
-            <Label htmlFor="skillsExpertise">Skills & Areas of Expertise</Label>
+            <Label htmlFor="skillsExpertise">{t('mentorship.skillsExpertise')}</Label>
             <Textarea
               id="skillsExpertise"
               name="skillsExpertise"
-              placeholder="What skills, knowledge, or life experiences can you share?"
+              placeholder={t('mentorship.skillsPlaceholder')}
               className="mt-1 min-h-24"
             />
           </div>
 
           <div>
-            <Label htmlFor="availability">Availability</Label>
+            <Label htmlFor="availability">{t('mentorship.availability')}</Label>
             <Textarea
               id="availability"
               name="availability"
-              placeholder="What days/times work best for you?"
+              placeholder={t('mentorship.availabilityPlaceholder')}
               className="mt-1 min-h-20"
             />
           </div>
@@ -155,7 +158,7 @@ export default function MentorshipForm() {
           <SubmitButton />
 
           <p className="text-sm text-center text-muted-foreground">
-            We&apos;ll review your application and get back to you within 5 business days
+            {t('mentorship.reviewMessage')}
           </p>
         </form>
       </CardContent>

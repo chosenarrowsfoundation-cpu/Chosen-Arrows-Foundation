@@ -1,6 +1,7 @@
 'use client'
 
 import { useTransition } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -11,12 +12,13 @@ import { submitContactForm } from '@/app/actions/contact/submit-contact-form'
 import { toast } from 'sonner'
 
 export function ContactForm() {
+  const { t } = useTranslation()
   const [isPending, startTransition] = useTransition()
 
   return (
     <Card>
       <CardContent className="p-8">
-        <h2 className="text-2xl font-bold mb-6">Send Us a Message</h2>
+        <h2 className="text-2xl font-bold mb-6">{t('contact.sendMessage')}</h2>
         <form
           className="space-y-6"
           action={(formData) => {
@@ -27,7 +29,7 @@ export function ContactForm() {
                 const form = document.getElementById('contact-form') as HTMLFormElement
                 form?.reset()
               } else {
-                toast.error('error' in result ? result.error : 'Something went wrong.')
+                toast.error('error' in result ? result.error : t('contact.somethingWentWrong'))
               }
             })
           }}
@@ -35,23 +37,23 @@ export function ContactForm() {
         >
           <div className="grid md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">{t('contact.fullName')}</Label>
               <Input
                 id="name"
                 name="name"
-                placeholder="John Doe"
+                placeholder={t('contact.placeholderName')}
                 className="mt-1"
                 required
                 disabled={isPending}
               />
             </div>
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('contact.email')}</Label>
               <Input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="john@example.com"
+                placeholder={t('contact.placeholderEmail')}
                 className="mt-1"
                 required
                 disabled={isPending}
@@ -60,11 +62,11 @@ export function ContactForm() {
           </div>
 
           <div>
-            <Label htmlFor="subject">Subject</Label>
+            <Label htmlFor="subject">{t('contact.subject')}</Label>
             <Input
               id="subject"
               name="subject"
-              placeholder="How can we help you?"
+              placeholder={t('contact.placeholderSubject')}
               className="mt-1"
               required
               disabled={isPending}
@@ -72,11 +74,11 @@ export function ContactForm() {
           </div>
 
           <div>
-            <Label htmlFor="message">Message</Label>
+            <Label htmlFor="message">{t('contact.message')}</Label>
             <Textarea
               id="message"
               name="message"
-              placeholder="Tell us more about your inquiry..."
+              placeholder={t('contact.placeholderMessage')}
               className="mt-1 min-h-40"
               required
               disabled={isPending}
@@ -94,7 +96,7 @@ export function ContactForm() {
             ) : (
               <Send className="w-5 h-5 mr-2" />
             )}
-            {isPending ? 'Sending...' : 'Send Message'}
+            {isPending ? t('contact.sending') : t('contact.send')}
           </Button>
         </form>
       </CardContent>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -12,6 +13,7 @@ import { Languages } from 'lucide-react';
 
 const LanguageSwitcher = () => {
   const { i18n } = useTranslation();
+  const router = useRouter();
 
   const languages = [
     { code: 'en', name: 'English' },
@@ -20,6 +22,12 @@ const LanguageSwitcher = () => {
   ];
 
   const currentLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+
+  const handleLanguageChange = async (code: string) => {
+    if (code === i18n.language) return;
+    await i18n.changeLanguage(code);
+    router.refresh();
+  };
 
   return (
     <DropdownMenu>
@@ -33,7 +41,7 @@ const LanguageSwitcher = () => {
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
-            onClick={() => i18n.changeLanguage(lang.code)}
+            onClick={() => handleLanguageChange(lang.code)}
             className={i18n.language === lang.code ? 'bg-muted' : ''}
           >
             {lang.name}

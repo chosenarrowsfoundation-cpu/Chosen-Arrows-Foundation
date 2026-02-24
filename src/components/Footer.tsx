@@ -47,10 +47,10 @@ const Footer = () => {
   ];
 
   const socialLinksArray = [
-    { icon: Facebook, href: socialLinks?.facebook || "#", label: "Facebook" },
-    { icon: X, href: socialLinks?.twitter || "https://x.com/ChosenArrows", label: "X" },
-    { icon: Instagram, href: socialLinks?.instagram || "#", label: "Instagram" },
-    { icon: Linkedin, href: socialLinks?.linkedin || "https://www.linkedin.com/company/chosen-arrows-foundation", label: "LinkedIn" },
+    { icon: Facebook, href: socialLinks?.facebook || "#", label: t("footer.facebook") },
+    { icon: X, href: socialLinks?.twitter || "https://x.com/ChosenArrows", label: t("footer.twitter") },
+    { icon: Instagram, href: socialLinks?.instagram || "#", label: t("footer.instagram") },
+    { icon: Linkedin, href: socialLinks?.linkedin || "https://www.linkedin.com/company/chosen-arrows-foundation", label: t("footer.linkedin") },
   ];
 
   const email = contactInfo?.email || contactInfo?.emails?.[0] || "chosenarrowsfoundation@gmail.com";
@@ -159,6 +159,14 @@ const Footer = () => {
         <div className="mt-12 pt-8 border-t border-border">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
             <p>© 2025 Chosen Arrows Foundation. {t("footer.rights")}.</p>
+            <a
+              href="https://digni-digital-llc.com/us-en/agentic-softwares"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground transition-colors duration-150"
+            >
+              Made with ❤️ by @itspascaldigny
+            </a>
             <div className="flex gap-6">
               <Link href="/privacy-policy" className="hover:text-foreground transition-colors duration-150">
                 {t("footer.privacy")}

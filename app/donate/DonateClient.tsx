@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,38 +55,40 @@ const defaultManualPayment: ManualPaymentDetails = {
   },
 };
 
-const donationFormSchema = z.object({
-  amount: z
-    .string()
-    .min(1, "Amount is required")
-    .refine((val) => {
-      const num = parseFloat(val);
-      return !isNaN(num) && num > 0;
-    }, "Amount must be a positive number")
-    .refine((val) => {
-      const num = parseFloat(val);
-      return num >= 1;
-    }, "Minimum donation amount is $1")
-    .refine((val) => {
-      const num = parseFloat(val);
-      return num <= 100000;
-    }, "Maximum donation amount is $100,000"),
-  frequency: z.enum(["once", "monthly"], {
-    required_error: "Please select a donation frequency",
-  }),
-  name: z
-    .string()
-    .min(2, "Name must be at least 2 characters")
-    .max(100, "Name must be less than 100 characters")
-    .regex(/^[a-zA-Z\s'-]+$/, "Name can only contain letters, spaces, hyphens, and apostrophes"),
-  email: z
-    .string()
-    .min(1, "Email is required")
-    .email("Please enter a valid email address")
-    .max(255, "Email must be less than 255 characters"),
-});
+function createDonationFormSchema(t: (key: string) => string) {
+  return z.object({
+    amount: z
+      .string()
+      .min(1, t("donate.amountRequired"))
+      .refine((val) => {
+        const num = parseFloat(val);
+        return !isNaN(num) && num > 0;
+      }, t("donate.amountPositive"))
+      .refine((val) => {
+        const num = parseFloat(val);
+        return num >= 1;
+      }, t("donate.amountMin"))
+      .refine((val) => {
+        const num = parseFloat(val);
+        return num <= 100000;
+      }, t("donate.amountMax")),
+    frequency: z.enum(["once", "monthly"], {
+      required_error: t("donate.frequencyRequired"),
+    }),
+    name: z
+      .string()
+      .min(2, t("donate.nameMin"))
+      .max(100, t("donate.nameMax"))
+      .regex(/^[a-zA-Z\s'-]+$/, t("donate.nameInvalid")),
+    email: z
+      .string()
+      .min(1, t("donate.emailRequired"))
+      .email(t("donate.emailInvalid"))
+      .max(255, t("donate.emailMax")),
+  });
+}
 
-type DonationFormValues = z.infer<typeof donationFormSchema>;
+type DonationFormValues = z.infer<ReturnType<typeof createDonationFormSchema>>;
 
 type PublicConfig = {
   paypalClientId: string | null;
@@ -101,6 +104,8 @@ export default function DonateClient({
   manualPaymentDetails?: ManualPaymentDetails;
   campaignId?: string;
 }) {
+  const { t } = useTranslation();
+  const donationFormSchema = useMemo(() => createDonationFormSchema(t), [t]);
   const [selectedAmount, setSelectedAmount] = useState("50");
   const bankDetails = manualPaymentDetails?.bank ?? defaultManualPayment.bank;
   const mpesaDetails = manualPaymentDetails?.mpesa ?? defaultManualPayment.mpesa;
@@ -155,11 +160,11 @@ export default function DonateClient({
     });
     const data = await res.json();
     if (!res.ok) {
-      toast.error(data.error ?? "Could not start payment");
+      toast.error(data.error ?? t("donate.couldNotStartPayment"));
       throw new Error(data.error ?? "Create order failed");
     }
     return data.orderId;
-  }, [form, campaignId]);
+  }, [form, campaignId, t]);
 
   const onApprove = useCallback(
     async (data: { orderID: string }) => {
@@ -209,10 +214,21 @@ export default function DonateClient({
               <Heart className="w-8 h-8 text-white" fill="currentColor" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold">
-              Make a <span className="bg-gradient-to-r from-taffy-500 to-mint-500 bg-clip-text text-transparent">Difference</span>
+              {t("donate.title").includes(" ") ? (
+                <>
+                  {t("donate.title").split(" ").slice(0, -1).join(" ")}{" "}
+                  <span className="bg-gradient-to-r from-taffy-500 to-mint-500 bg-clip-text text-transparent">
+                    {t("donate.title").split(" ").slice(-1)[0]}
+                  </span>
+                </>
+              ) : (
+                <span className="bg-gradient-to-r from-taffy-500 to-mint-500 bg-clip-text text-transparent">
+                  {t("donate.title")}
+                </span>
+              )}
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground">
-              Your generosity changes lives. Every donation helps guide a child toward their divine destiny.
+              {t("donate.subtitle")}
             </p>
           </div>
         </div>
@@ -235,7 +251,7 @@ export default function DonateClient({
                       name="frequency"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-lg font-semibold">Donation Frequency</FormLabel>
+                          <FormLabel className="text-lg font-semibold">{t("donate.frequency")}</FormLabel>
                           <FormControl>
                             <RadioGroup
                               onValueChange={field.onChange}
@@ -248,7 +264,7 @@ export default function DonateClient({
                                   htmlFor="once"
                                   className="flex items-center justify-center rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
                                 >
-                                  One-time
+                                  {t("donate.oneTime")}
                                 </Label>
                               </div>
                               <div>
@@ -257,7 +273,7 @@ export default function DonateClient({
                                   htmlFor="monthly"
                                   className="flex items-center justify-center rounded-lg border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary cursor-pointer"
                                 >
-                                  Monthly
+                                  {t("donate.monthly")}
                                 </Label>
                               </div>
                             </RadioGroup>
@@ -273,7 +289,7 @@ export default function DonateClient({
                       name="amount"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel className="text-lg font-semibold">Select Amount</FormLabel>
+                          <FormLabel className="text-lg font-semibold">{t("donate.selectAmount")}</FormLabel>
                           <FormControl>
                             <div className="space-y-3">
                               <div className="grid grid-cols-3 gap-3">
@@ -296,7 +312,7 @@ export default function DonateClient({
                                   {...field}
                                   onChange={(e) => handleAmountChange(e.target.value)}
                                   className="pl-7 h-12 text-lg"
-                                  placeholder="Custom amount"
+                                  placeholder={t("donate.customAmount")}
                                   min="1"
                                   max="100000"
                                   step="0.01"
@@ -311,16 +327,16 @@ export default function DonateClient({
 
                     {/* Personal Information */}
                     <div className="space-y-4">
-                      <Label className="text-lg font-semibold">Your Information</Label>
+                      <Label className="text-lg font-semibold">{t("donate.yourInfo")}</Label>
                       <div className="grid gap-4">
                         <FormField
                           control={form.control}
                           name="name"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Full Name</FormLabel>
+                              <FormLabel>{t("donate.fullName")}</FormLabel>
                               <FormControl>
-                                <Input {...field} placeholder="John Doe" className="mt-1" />
+                                <Input {...field} placeholder={t("contact.placeholderName")} className="mt-1" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -331,12 +347,12 @@ export default function DonateClient({
                           name="email"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Email Address</FormLabel>
+                              <FormLabel>{t("donate.emailAddress")}</FormLabel>
                               <FormControl>
                                 <Input
                                   {...field}
                                   type="email"
-                                  placeholder="john@example.com"
+                                  placeholder={t("contact.placeholderEmail")}
                                   className="mt-1"
                                 />
                               </FormControl>
@@ -349,38 +365,38 @@ export default function DonateClient({
 
                     {/* Payment Methods */}
                     <div className="pt-4">
-                      <Label className="text-lg font-semibold mb-4 block">Select Payment Method</Label>
+                      <Label className="text-lg font-semibold mb-4 block">{t("donate.selectPaymentMethod")}</Label>
                       <Tabs defaultValue="card" className="w-full">
                         <TabsList className="grid w-full grid-cols-3 mb-6">
                           <TabsTrigger value="card" className="flex gap-2 text-xs md:text-sm px-1 md:px-3">
-                            <CreditCard className="w-4 h-4 hidden md:block" /> Card/Mobile
+                            <CreditCard className="w-4 h-4 hidden md:block" /> {t("donate.cardMobile")}
                           </TabsTrigger>
                           <TabsTrigger value="paypal" className="flex gap-2 text-xs md:text-sm px-1 md:px-3">
                             <span className="text-[#003087] font-bold">Pay</span><span className="text-[#009cde] font-bold">Pal</span>
                           </TabsTrigger>
                           <TabsTrigger value="manual" className="flex gap-2 text-xs md:text-sm px-1 md:px-3">
-                            <Banknote className="w-4 h-4 hidden md:block" /> Manual
+                            <Banknote className="w-4 h-4 hidden md:block" /> {t("donate.manual")}
                           </TabsTrigger>
                         </TabsList>
 
                         {/* FLUTTERWAVE (Card & Mobile Money) */}
                         <TabsContent value="card" className="space-y-4">
                           <div className="bg-muted/50 p-4 rounded-lg border border-muted text-sm text-muted-foreground mb-4">
-                            <p>Securely pay with <strong>Credit/Debit Card</strong> or <strong>Mobile Money (M-Pesa)</strong>.</p>
+                            <p>{t("donate.paySecurely")}</p>
                           </div>
 
                           {flutterwavePublicKey ? (
                             <div className="flex justify-center">
                               <FlutterWaveButton
                                 className="w-full h-12 bg-gradient-to-r from-mint-500 to-taffy-500 hover:from-mint-600 hover:to-taffy-600 text-white font-bold rounded-md shadow-md transition-all flex items-center justify-center gap-2"
-                                text={`Donate $${form.getValues("amount") || selectedAmount}`}
+                                text={t("donate.donateAmount", { amount: form.getValues("amount") || selectedAmount })}
                                 callback={(response) => {
                                   console.log(response);
                                   closePaymentModal();
                                   if (response.status === "successful") {
                                     window.location.href = "/donate/success?payment=flutterwave&ref=" + response.tx_ref;
                                   } else {
-                                    toast.error("Payment not completed.");
+                                    toast.error(t("donate.paymentNotCompleted"));
                                   }
                                 }}
                                 onClose={() => { }}
@@ -406,7 +422,7 @@ export default function DonateClient({
                             </div>
                           ) : (
                             <p className="text-destructive text-center text-sm bg-destructive/10 p-2 rounded">
-                              Flutterwave Public Key missing. Set NEXT_PUBLIC_FLUTTERWAVE_PUBLIC_KEY.
+                              {t("donate.flutterwaveMissing")}
                             </p>
                           )}
                         </TabsContent>
@@ -416,7 +432,7 @@ export default function DonateClient({
                           {paypalClientId ? (
                             <div className="space-y-3 min-h-[150px]">
                               <p className="text-sm font-medium text-center text-muted-foreground mb-2">
-                                Pay securely with PayPal account
+                                {t("donate.paypalSecure")}
                               </p>
                               <PayPalScriptProvider
                                 options={{
@@ -440,7 +456,7 @@ export default function DonateClient({
                             </div>
                           ) : (
                             <p className="text-sm text-center text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200">
-                              PayPal is not configured.
+                              {t("donate.paypalNotConfigured")}
                             </p>
                           )}
                         </TabsContent>
@@ -451,19 +467,19 @@ export default function DonateClient({
                           <div className="space-y-3 p-4 bg-secondary/20 rounded-lg border border-border">
                             <div className="flex items-center gap-2 font-semibold text-primary">
                               <Building2 className="w-5 h-5" />
-                              <h3>Bank Transfer</h3>
+                              <h3>{t("donate.bankTransfer")}</h3>
                             </div>
                             <div className="grid grid-cols-[80px_1fr] gap-2 text-sm">
-                              <span className="text-muted-foreground">Bank:</span>
+                              <span className="text-muted-foreground">{t("donate.bank")}:</span>
                               <span className="font-medium">{bankDetails.bankName}</span>
 
-                              <span className="text-muted-foreground">Acc Name:</span>
+                              <span className="text-muted-foreground">{t("donate.accName")}:</span>
                               <span className="font-medium">{bankDetails.accountName}</span>
 
-                              <span className="text-muted-foreground">Acc No:</span>
+                              <span className="text-muted-foreground">{t("donate.accNo")}:</span>
                               <span className="font-medium font-mono">{bankDetails.accountNumber}</span>
 
-                              <span className="text-muted-foreground">SWIFT:</span>
+                              <span className="text-muted-foreground">{t("donate.swift")}:</span>
                               <span className="font-medium">{bankDetails.swiftCode}</span>
                             </div>
                           </div>
@@ -472,22 +488,22 @@ export default function DonateClient({
                           <div className="space-y-3 p-4 bg-green-500/10 rounded-lg border border-green-500/20">
                             <div className="flex items-center gap-2 font-semibold text-green-700 dark:text-green-400">
                               <Phone className="w-5 h-5" />
-                              <h3>M-Pesa (Manual)</h3>
+                              <h3>{t("donate.mpesaManual")}</h3>
                             </div>
                             <div className="text-sm space-y-2">
                               <p className="font-medium">{mpesaDetails.instructions}</p>
                               <div className="grid grid-cols-[80px_1fr] gap-2">
-                                <span className="text-muted-foreground">Number:</span>
+                                <span className="text-muted-foreground">{t("donate.number")}:</span>
                                 <span className="font-medium font-mono text-lg">{mpesaDetails.number}</span>
 
-                                <span className="text-muted-foreground">Details:</span>
+                                <span className="text-muted-foreground">{t("donate.details")}:</span>
                                 <span className="font-medium">{mpesaDetails.name}</span>
                               </div>
                             </div>
                           </div>
 
                           <div className="text-xs text-muted-foreground text-center">
-                            * For manual transfers, please email proof of payment to finance@chosenarrows.org
+                            * {t("donate.manualTransferNote")}
                           </div>
                         </TabsContent>
                       </Tabs>
@@ -496,7 +512,7 @@ export default function DonateClient({
                     {/* Security Note */}
                     <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                       <Shield className="w-4 h-4" />
-                      <span>Secure & encrypted payment processing</span>
+                      <span>{t("donate.secure")}</span>
                     </div>
                   </CardContent>
                 </Card>
@@ -507,12 +523,12 @@ export default function DonateClient({
             <Card className="mt-6 bg-gradient-to-br from-mint-50 to-taffy-50/50 border-mint-200/50">
               <CardContent className="p-6 text-center">
                 <p className="text-lg font-medium">
-                  ${selectedAmount} {form.watch("frequency") === "monthly" ? "monthly" : ""} can provide:
+                  ${selectedAmount} {form.watch("frequency") === "monthly" ? t("donate.monthly") : ""} {t("donate.impactMessage")}
                 </p>
                 <ul className="mt-4 space-y-2 text-muted-foreground">
-                  <li className="flex items-center justify-center gap-2"><span className="text-mint-500">✓</span> School supplies for 2 children</li>
-                  <li className="flex items-center justify-center gap-2"><span className="text-taffy-500">✓</span> Weekly meals for 5 children</li>
-                  <li className="flex items-center justify-center gap-2"><span className="text-mint-500">✓</span> Medical checkup for 1 child</li>
+                  <li className="flex items-center justify-center gap-2"><span className="text-mint-500">✓</span> {t("donate.impact1")}</li>
+                  <li className="flex items-center justify-center gap-2"><span className="text-taffy-500">✓</span> {t("donate.impact2")}</li>
+                  <li className="flex items-center justify-center gap-2"><span className="text-mint-500">✓</span> {t("donate.impact3")}</li>
                 </ul>
               </CardContent>
             </Card>

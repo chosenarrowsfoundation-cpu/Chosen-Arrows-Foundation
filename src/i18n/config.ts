@@ -19,6 +19,13 @@ i18n
     interpolation: {
       escapeValue: false,
     },
+    detection: {
+      order: ['cookie', 'localStorage', 'navigator', 'htmlTag'],
+      caches: ['cookie', 'localStorage'],
+      lookupCookie: 'i18next',
+      lookupLocalStorage: 'i18nextLng',
+      cookieOptions: { path: '/', sameSite: 'lax', maxAge: 365 * 24 * 60 * 60 },
+    },
   });
 
 export default i18n;
