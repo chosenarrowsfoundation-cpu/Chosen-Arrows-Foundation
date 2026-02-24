@@ -1,6 +1,6 @@
 "use client";
 
-import { Heart, Shield, HandHeart, Sparkles, CheckCircle, Users } from "lucide-react";
+import { Heart, Shield, HandHeart, Sparkles, CheckCircle } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 type ValuesContent = {
@@ -24,7 +24,6 @@ const iconMap: Record<string, typeof HandHeart> = {
   trust: Heart,
   adeptness: Sparkles,
   honesty: CheckCircle,
-  community: Users,
 };
 
 const ValuesSection = ({ content }: { content?: ValuesContent }) => {
@@ -56,19 +55,16 @@ const ValuesSection = ({ content }: { content?: ValuesContent }) => {
       titleKey: "values.honesty",
       descKey: "values.honestyDesc",
     },
-    {
-      icon: Users,
-      titleKey: "values.community",
-      descKey: "values.communityDesc",
-    },
   ];
 
   const values = content?.values?.length
-    ? content.values.map((value) => ({
-        icon: iconMap[value.key || ""] || Heart,
-        title: value.title,
-        description: value.description,
-      }))
+    ? content.values
+        .filter((v) => (v.key || "").toLowerCase() !== "community")
+        .map((value) => ({
+          icon: iconMap[value.key || ""] || Heart,
+          title: value.title,
+          description: value.description,
+        }))
     : fallbackValues.map((value) => ({
         ...value,
         title: t(value.titleKey),
@@ -80,9 +76,12 @@ const ValuesSection = ({ content }: { content?: ValuesContent }) => {
       <div className="enterprise-container">
         {/* Section Header */}
         <div className="max-w-2xl mx-auto text-center mb-12 md:mb-16">
-          <h2 className="mb-4 text-foreground text-balance">
+          <h2 className="mb-2 text-foreground text-balance">
             {content?.title ?? t("values.title")}
           </h2>
+          <div className="mb-4 text-xl sm:text-2xl font-bold text-mint-500 tracking-wide">
+            {t("values.ritah")}
+          </div>
           <p className="text-muted-foreground text-lg">
             {content?.description ?? t("values.description")}
           </p>

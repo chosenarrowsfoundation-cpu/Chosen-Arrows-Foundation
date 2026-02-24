@@ -19,7 +19,8 @@
   },
   "values": {
     "title": "Our Core Values",
-    "subtitle": "R.I.T.A.H + Community",
+    "ritah": "R.I.T.A.H",
+    "subtitle": "R.I.T.A.H",
     "description": "Guiding principles that shape everything we do and every life we touch",
     "responsibility": "Responsibility",
     "responsibilityDesc": "We care for every child entrusted to us with compassion and accountability.",
