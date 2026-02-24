@@ -7,6 +7,7 @@ import CommunitySection from "@/components/CommunitySection";
 import CTASection from "@/components/CTASection";
 import { getContent } from "@/app/actions/content/get-content";
 import { getCampaigns } from "@/app/actions/campaigns/get-campaigns";
+import { getTotalFundsRaised } from "@/app/actions/campaigns/get-total-funds-raised";
 import { getGoogleTestimonials } from "@/app/actions/testimonials/get-google-testimonials";
 import { getSetting } from "@/app/actions/settings/get-settings";
 import { getServerLanguage } from "@/lib/i18n";
@@ -60,7 +61,7 @@ export default async function HomePage() {
   const language = await getServerLanguage();
   
   // Fetch all content in parallel
-  const [heroContent, valuesContent, impactContent, communityContent, ctaContent, campaignsRaw, testimonials, heroStats, heroVideo, communityVideo] = await Promise.all([
+  const [heroContent, valuesContent, impactContent, communityContent, ctaContent, campaignsRaw, testimonials, heroStats, heroVideo, communityVideo, totalFundsRaised] = await Promise.all([
     getContent('hero', language).catch(() => null),
     getContent('values', language).catch(() => null),
     getContent('impact', language).catch(() => null),
@@ -71,6 +72,7 @@ export default async function HomePage() {
     getSetting('hero_stats').catch(() => null),
     getSetting('hero_video').catch(() => null),
     getSetting('community_video').catch(() => null),
+    getTotalFundsRaised().catch(() => 0),
   ]);
 
   // Transform campaigns to match CampaignsSection expected format
@@ -89,14 +91,17 @@ export default async function HomePage() {
     daysLeft: campaign.days_left,
   }));
 
-  // Merge hero stats from settings into hero content
-  const heroContentWithStats = heroContent && heroStats ? {
-    ...heroContent,
-    stats: {
-      ...heroContent.stats,
-      ...heroStats,
-    }
-  } : heroContent;
+  // Merge hero stats from settings; override fundsRaised with live total from campaigns
+  const heroContentWithStats = heroContent
+    ? {
+        ...heroContent,
+        stats: {
+          ...heroContent.stats,
+          ...(heroStats || {}),
+          fundsRaised: totalFundsRaised,
+        },
+      }
+    : { stats: { fundsRaised: totalFundsRaised } };
 
   const heroVideoConfig = heroVideo as { url?: string; posterUrl?: string } | null
   const communityVideoConfig = communityVideo as { url?: string; posterUrl?: string } | null
