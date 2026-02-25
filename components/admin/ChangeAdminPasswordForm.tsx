@@ -52,7 +52,7 @@ export default function ChangeAdminPasswordForm() {
         })
         form.reset()
       } else {
-        toast.error('Failed to update password', { description: result.error })
+        toast.error('Failed to update password', { description: 'error' in result ? result.error : 'Unknown error' })
       }
     } catch {
       toast.error('An error occurred', { description: 'Please try again later.' })
