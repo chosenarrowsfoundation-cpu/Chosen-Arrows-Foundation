@@ -107,7 +107,7 @@ const CampaignsSection = ({ campaigns }: CampaignsSectionProps) => {
 
   return (
     <section ref={targetRef} id="campaigns" className="relative h-[300vh] bg-gradient-to-b from-mint-50/50 to-white">
-      <div className="sticky top-0 flex h-screen flex-col justify-center overflow-hidden py-12">
+      <div className="sticky top-0 flex min-h-screen flex-col justify-center overflow-hidden pt-16 pb-16 md:pt-20 md:pb-20">
         {/* Section Header */}
         <div className="max-w-2xl mx-auto text-center mb-8 px-4 md:mb-12 shrink-0">
           <h2 className="mb-4 text-foreground text-balance">
