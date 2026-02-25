@@ -10,17 +10,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { 
-  User, 
-  Settings, 
-  LogOut, 
-  Moon, 
-  Sun
-} from 'lucide-react'
+import { Settings, LogOut, Moon, Sun } from 'lucide-react'
 import { adminLogout } from '@/app/actions/auth/admin-login'
-import { cn } from '@/lib/utils'
 import Link from 'next/link'
-import { MobileNav } from './MobileNav'
+import { SidebarTrigger } from '@/components/ui/sidebar'
 
 interface AdminHeaderProps {
   user: {
@@ -53,11 +46,9 @@ export default function AdminHeader({ user }: AdminHeaderProps) {
 
   return (
     <header className="sticky top-0 z-40 h-16 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="flex h-full items-center justify-between px-4 lg:px-6 w-full">
-        {/* Left side - Mobile menu */}
-        <div className="flex items-center gap-4">
-          <MobileNav />
-        </div>
+      <div className="flex h-full items-center justify-between px-3 sm:px-4 lg:px-6 w-full min-w-0">
+        {/* Left side - Sidebar toggle (mobile: opens sheet, desktop: collapse/expand) */}
+        <SidebarTrigger className="text-muted-foreground hover:text-foreground" />
 
         {/* Right side */}
         <div className="flex items-center gap-2">

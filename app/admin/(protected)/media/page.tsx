@@ -28,9 +28,9 @@ export default async function MediaPage() {
   return (
     <div className="space-y-8">
       {/* Page header */}
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight">Media Library</h1>
-        <p className="text-muted-foreground">
+      <header className="min-w-0">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Media Library</h1>
+        <p className="text-muted-foreground text-sm mt-0.5">
           Manage all uploaded images and media files. Control which Journey images appear on the About page in the section below.
         </p>
       </header>

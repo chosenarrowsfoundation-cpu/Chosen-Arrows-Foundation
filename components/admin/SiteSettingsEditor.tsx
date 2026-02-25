@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { uploadVideo } from '@/app/actions/media/upload-video'
+import { uploadImage } from '@/app/actions/media/upload-image'
 import {
   Form,
   FormControl,
@@ -20,7 +21,7 @@ import {
 } from '@/components/ui/form'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { toast } from 'sonner'
-import { Loader2, Save, Upload, Video } from 'lucide-react'
+import { Loader2, Save, Upload, Video, ImageIcon } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { updateMultipleSettings } from '@/app/actions/settings/update-settings'
 
@@ -35,8 +36,10 @@ const settingsSchema = z.object({
     posterUrl: z.string().optional(),
   }).optional(),
   community_video: z.object({
+    enabled: z.boolean().optional(),
     url: z.string().optional(),
     posterUrl: z.string().optional(),
+    mediaType: z.enum(['video', 'image']).optional(),
   }).optional(),
   impact_stats: z.array(z.object({
     value: z.string(),
@@ -49,7 +52,7 @@ const settingsSchema = z.object({
     transparency: z.string(),
   }).optional(),
   contact_info: z.object({
-    emails: z.array(z.string().email()),
+    emails: z.array(z.string().email()).optional().default([]),
     phone: z.string(),
     address: z.string(),
     officeHours: z.object({
@@ -59,10 +62,10 @@ const settingsSchema = z.object({
     }),
   }).optional(),
   social_links: z.object({
-    facebook: z.string().url().optional().nullable(),
-    twitter: z.string().url().optional().nullable(),
-    instagram: z.string().url().optional().nullable(),
-    linkedin: z.string().url().optional().nullable(),
+    facebook: z.preprocess((v) => (v === '' || v === undefined ? null : v), z.string().url().nullable().optional()),
+    twitter: z.preprocess((v) => (v === '' || v === undefined ? null : v), z.string().url().nullable().optional()),
+    instagram: z.preprocess((v) => (v === '' || v === undefined ? null : v), z.string().url().nullable().optional()),
+    linkedin: z.preprocess((v) => (v === '' || v === undefined ? null : v), z.string().url().nullable().optional()),
   }).optional(),
   testimonials_config: z.object({
     enabled: z.boolean(),
@@ -96,8 +99,10 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
   const [isSaving, setIsSaving] = useState(false)
   const [isUploadingVideo, setIsUploadingVideo] = useState(false)
   const [isUploadingCommunityVideo, setIsUploadingCommunityVideo] = useState(false)
+  const [isUploadingCommunityImage, setIsUploadingCommunityImage] = useState(false)
   const videoInputRef = useRef<HTMLInputElement>(null)
   const communityVideoInputRef = useRef<HTMLInputElement>(null)
+  const communityImageInputRef = useRef<HTMLInputElement>(null)
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
@@ -111,9 +116,11 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
         url: '',
         posterUrl: '',
       },
-      community_video: initialSettings.community_video || {
-        url: '',
-        posterUrl: '',
+      community_video: {
+        enabled: initialSettings.community_video?.enabled ?? false,
+        url: initialSettings.community_video?.url ?? '',
+        posterUrl: initialSettings.community_video?.posterUrl ?? '',
+        mediaType: (initialSettings.community_video?.mediaType ?? 'video') as 'video' | 'image',
       },
       impact_stats: initialSettings.impact_stats || [],
       community_stats: initialSettings.community_stats || {
@@ -121,16 +128,30 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
         avgRating: '4.9★',
         transparency: '100%',
       },
-      contact_info: initialSettings.contact_info || {
-        emails: ['info@chosenarrowsfoundation.org', 'support@chosenarrowsfoundation.org'],
-        phone: '0798 213 309',
-        address: 'Nanyuki, Marura Block 3\nSweet Water Road',
-        officeHours: {
-          monday: 'Monday - Friday: 9:00 AM - 5:00 PM',
-          saturday: 'Saturday: 10:00 AM - 2:00 PM',
-          sunday: 'Sunday: Closed',
-        },
-      },
+      contact_info: (() => {
+        const defaults = {
+          emails: ['info@chosenarrowsfoundation.org', 'support@chosenarrowsfoundation.org'],
+          phone: '0798 213 309',
+          address: 'Nanyuki, Marura Block 3\nSweet Water Road',
+          officeHours: {
+            monday: 'Monday - Friday: 9:00 AM - 5:00 PM',
+            saturday: 'Saturday: 10:00 AM - 2:00 PM',
+            sunday: 'Sunday: Closed',
+          },
+        }
+        const fromDb = initialSettings.contact_info
+        if (!fromDb) return defaults
+        return {
+          emails: Array.isArray(fromDb.emails) && fromDb.emails.length > 0 ? fromDb.emails : defaults.emails,
+          phone: fromDb.phone ?? defaults.phone,
+          address: fromDb.address ?? defaults.address,
+          officeHours: {
+            monday: fromDb.officeHours?.monday ?? defaults.officeHours.monday,
+            saturday: fromDb.officeHours?.saturday ?? defaults.officeHours.saturday,
+            sunday: fromDb.officeHours?.sunday ?? defaults.officeHours.sunday,
+          },
+        }
+      })(),
       social_links: initialSettings.social_links || {
         facebook: null,
         twitter: 'https://x.com/ChosenArrows',
@@ -186,6 +207,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
       const result = await uploadVideo(file, 'community')
       if (result.success) {
         form.setValue('community_video.url', result.url)
+        form.setValue('community_video.mediaType', 'video')
         toast.success('Community video uploaded', { description: 'Click Save All Settings to apply.' })
       } else {
         toast.error('Upload failed', { description: 'error' in result ? result.error : 'Please try again.' })
@@ -195,6 +217,27 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
     } finally {
       setIsUploadingCommunityVideo(false)
       if (communityVideoInputRef.current) communityVideoInputRef.current.value = ''
+    }
+  }
+
+  const handleCommunityImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setIsUploadingCommunityImage(true)
+    try {
+      const result = await uploadImage(file, 'community')
+      if (result.success) {
+        form.setValue('community_video.url', result.url)
+        form.setValue('community_video.mediaType', 'image')
+        toast.success('Community image uploaded', { description: 'Click Save All Settings to apply.' })
+      } else {
+        toast.error('Upload failed', { description: 'error' in result ? result.error : 'Please try again.' })
+      }
+    } catch (err) {
+      toast.error('Upload failed', { description: 'Please try again.' })
+    } finally {
+      setIsUploadingCommunityImage(false)
+      if (communityImageInputRef.current) communityImageInputRef.current.value = ''
     }
   }
 
@@ -306,7 +349,14 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form
+            onSubmit={form.handleSubmit(onSubmit, (errors) => {
+              const firstError = Object.values(errors)[0]
+              const message = firstError?.message ?? 'Please fix the validation errors below.'
+              toast.error('Validation failed', { description: message })
+            })}
+            className="space-y-6"
+          >
             <Tabs defaultValue="hero" className="w-full">
               <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="hero">Hero Stats</TabsTrigger>
@@ -412,6 +462,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                           <Input
                             type="number"
                             {...field}
+                            value={field.value ?? ''}
                             onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                             min="0"
                           />
@@ -431,6 +482,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                           <Input
                             type="number"
                             {...field}
+                            value={field.value ?? ''}
                             onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                             min="0"
                           />
@@ -450,6 +502,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                           <Input
                             type="number"
                             {...field}
+                            value={field.value ?? ''}
                             onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
                             min="0"
                           />
@@ -463,14 +516,33 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
 
               {/* Community Stats */}
               <TabsContent value="community" className="space-y-4 mt-6">
-                {/* Community Section Video */}
+                {/* Community Section Media (Video or Image) */}
                 <div className="rounded-lg border border-border p-4 space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Video className="h-5 w-5" />
-                    <h4 className="font-medium">Community Section Video</h4>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <Video className="h-5 w-5" />
+                      <h4 className="font-medium">Community Section Media</h4>
+                    </div>
+                    <FormField
+                      control={form.control}
+                      name="community_video.enabled"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center gap-2 space-y-0">
+                          <FormControl>
+                            <Checkbox
+                              checked={field.value !== false}
+                              onCheckedChange={(v) => field.onChange(v !== false)}
+                            />
+                          </FormControl>
+                          <FormLabel className="text-sm font-normal cursor-pointer">
+                            Show media (uncheck to leave section blank)
+                          </FormLabel>
+                        </FormItem>
+                      )}
+                    />
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Upload a video or paste a URL. Shown in the community section on the homepage. MP4 or WebM, max 50MB.
+                    Upload a video or image, or paste a URL. Shown in the community section on the homepage. Default: African children video. Videos: MP4 or WebM, max 50MB. Images: JPEG, PNG, WebP, max 5MB.
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3">
                     <FormField
@@ -478,29 +550,44 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                       name="community_video.url"
                       render={({ field }) => (
                         <FormItem className="flex-1">
-                          <FormLabel>Video URL</FormLabel>
+                          <FormLabel>Video or Image URL</FormLabel>
                           <FormControl>
                             <Input
                               {...field}
                               value={field.value || ''}
-                              onChange={(e) => field.onChange(e.target.value)}
-                              placeholder="/hero-background.mp4"
+                              onChange={(e) => {
+                                field.onChange(e.target.value)
+                                const val = e.target.value.toLowerCase()
+                                if (val.match(/\.(jpg|jpeg|png|webp|gif)(\?|$)/)) {
+                                  form.setValue('community_video.mediaType', 'image')
+                                } else if (val.match(/\.(mp4|webm)(\?|$)/)) {
+                                  form.setValue('community_video.mediaType', 'video')
+                                }
+                              }}
+                              placeholder="Leave empty for default African kids video"
                             />
                           </FormControl>
                           <p className="text-xs text-muted-foreground">
-                            Leave empty to use the default video, or paste an external URL.
+                            Leave empty to use the default video, or paste a video/image URL.
                           </p>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    <div className="flex flex-col justify-end gap-2">
+                    <div className="flex flex-col sm:flex-row justify-end gap-2">
                       <input
                         ref={communityVideoInputRef}
                         type="file"
                         accept="video/mp4,video/webm"
                         className="hidden"
                         onChange={handleCommunityVideoUpload}
+                      />
+                      <input
+                        ref={communityImageInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        className="hidden"
+                        onChange={handleCommunityImageUpload}
                       />
                       <Button
                         type="button"
@@ -509,16 +596,24 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                         disabled={isUploadingCommunityVideo}
                       >
                         {isUploadingCommunityVideo ? (
-                          <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Uploading...
-                          </>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         ) : (
-                          <>
-                            <Upload className="h-4 w-4 mr-2" />
-                            Upload Video
-                          </>
+                          <Video className="h-4 w-4 mr-2" />
                         )}
+                        Upload Video
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => communityImageInputRef.current?.click()}
+                        disabled={isUploadingCommunityImage}
+                      >
+                        {isUploadingCommunityImage ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <ImageIcon className="h-4 w-4 mr-2" />
+                        )}
+                        Upload Image
                       </Button>
                     </div>
                   </div>
@@ -527,7 +622,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                     name="community_video.posterUrl"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Poster Image URL (optional)</FormLabel>
+                        <FormLabel>Poster Image URL (optional, for video)</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
@@ -537,7 +632,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                           />
                         </FormControl>
                         <p className="text-xs text-muted-foreground">
-                          Image shown before the video loads.
+                          Image shown before the video loads. Ignored for image media.
                         </p>
                         <FormMessage />
                       </FormItem>
@@ -553,7 +648,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                       <FormItem>
                         <FormLabel>Donor Retention</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="98%" />
+                          <Input {...field} value={field.value ?? ''} placeholder="98%" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -567,7 +662,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                       <FormItem>
                         <FormLabel>Average Rating</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="4.9★" />
+                          <Input {...field} value={field.value ?? ''} placeholder="4.9★" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -581,7 +676,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                       <FormItem>
                         <FormLabel>Transparency</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="100%" />
+                          <Input {...field} value={field.value ?? ''} placeholder="100%" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -647,7 +742,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                     <FormItem>
                       <FormLabel>Phone Number</FormLabel>
                       <FormControl>
-                        <Input {...field} placeholder="+1 (555) 123-4567" />
+                        <Input {...field} value={field.value ?? ''} placeholder="+1 (555) 123-4567" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -663,6 +758,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                       <FormControl>
                         <Textarea
                           {...field}
+                          value={field.value ?? ''}
                           className="min-h-20"
                           placeholder="Nanyuki, Marura Block 3&#10;Sweet Water Road"
                         />
@@ -680,7 +776,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                       <FormItem>
                         <FormLabel>Monday - Friday</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="9:00 AM - 5:00 PM" />
+                          <Input {...field} value={field.value ?? ''} placeholder="9:00 AM - 5:00 PM" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -694,7 +790,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                       <FormItem>
                         <FormLabel>Saturday</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="10:00 AM - 2:00 PM" />
+                          <Input {...field} value={field.value ?? ''} placeholder="10:00 AM - 2:00 PM" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -708,7 +804,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                       <FormItem>
                         <FormLabel>Sunday</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Closed" />
+                          <Input {...field} value={field.value ?? ''} placeholder="Closed" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -814,7 +910,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                           <FormItem>
                             <FormLabel>Bank Name</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="[BANK NAME]" />
+                              <Input {...field} value={field.value ?? ''} placeholder="[BANK NAME]" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -827,7 +923,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                           <FormItem>
                             <FormLabel>Account Name</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Chosen Arrows Foundation" />
+                              <Input {...field} value={field.value ?? ''} placeholder="Chosen Arrows Foundation" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -840,7 +936,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                           <FormItem>
                             <FormLabel>Account Number</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="[ACCOUNT NUMBER]" />
+                              <Input {...field} value={field.value ?? ''} placeholder="[ACCOUNT NUMBER]" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -853,7 +949,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                           <FormItem>
                             <FormLabel>SWIFT Code</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="[SWIFT CODE]" />
+                              <Input {...field} value={field.value ?? ''} placeholder="[SWIFT CODE]" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -866,7 +962,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                           <FormItem>
                             <FormLabel>Currency</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="USD / KES" />
+                              <Input {...field} value={field.value ?? ''} placeholder="USD / KES" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -884,7 +980,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                           <FormItem>
                             <FormLabel>Paybill / Phone Number</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="[NUMBER]" />
+                              <Input {...field} value={field.value ?? ''} placeholder="[NUMBER]" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -897,7 +993,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                           <FormItem>
                             <FormLabel>Account Name</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Chosen Arrows Foundation" />
+                              <Input {...field} value={field.value ?? ''} placeholder="Chosen Arrows Foundation" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -910,7 +1006,7 @@ export default function SiteSettingsEditor({ initialSettings }: SiteSettingsEdit
                           <FormItem className="md:col-span-2">
                             <FormLabel>Instructions</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Go to M-Pesa > Lipa na M-Pesa > Paybill/Buy Goods" />
+                              <Input {...field} value={field.value ?? ''} placeholder="Go to M-Pesa > Lipa na M-Pesa > Paybill/Buy Goods" />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

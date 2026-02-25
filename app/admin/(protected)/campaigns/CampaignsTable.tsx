@@ -60,8 +60,8 @@ export default function CampaignsTable({ campaigns }: CampaignsTableProps) {
 
   return (
     <div className="space-y-6">
-      <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
+      <Card className="overflow-hidden min-w-0">
+        <div className="overflow-x-auto min-w-0">
         <Table>
           <TableHeader>
             <TableRow>
@@ -176,10 +176,11 @@ export default function CampaignsTable({ campaigns }: CampaignsTableProps) {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between">
-          <div className="text-sm text-muted-foreground">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-sm text-muted-foreground order-2 sm:order-1">
             Showing {((currentPage - 1) * CAMPAIGNS_PER_PAGE) + 1} to {Math.min(currentPage * CAMPAIGNS_PER_PAGE, campaigns.length)} of {campaigns.length} campaigns
           </div>
+          <div className="order-1 sm:order-2">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
@@ -188,6 +189,7 @@ export default function CampaignsTable({ campaigns }: CampaignsTableProps) {
             showFirstLast={false}
             maxPageButtons={5}
           />
+          </div>
         </div>
       )}
     </div>

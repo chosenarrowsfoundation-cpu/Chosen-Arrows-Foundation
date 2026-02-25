@@ -105,7 +105,16 @@ export default async function HomePage() {
     : { stats: { fundsRaised: totalFundsRaised } };
 
   const heroVideoConfig = heroVideo as { url?: string; posterUrl?: string } | null
-  const communityVideoConfig = communityVideo as { url?: string; posterUrl?: string } | null
+  const communityMediaConfig = communityVideo as {
+    url?: string;
+    posterUrl?: string;
+    enabled?: boolean;
+    mediaType?: 'video' | 'image';
+  } | null
+
+  // Resolve community media URL on server to avoid hydration mismatch (single source of truth)
+  const DEFAULT_COMMUNITY_VIDEO = 'https://videos.pexels.com/video-files/35025845/14838443_2560_1440_60fps.mp4'
+  const communityMediaUrl = (communityMediaConfig?.url?.trim() || DEFAULT_COMMUNITY_VIDEO)
   const heroLabels = getHeroLabels(language)
 
   return (
@@ -115,7 +124,14 @@ export default async function HomePage() {
       <ValuesSection content={valuesContent} />
       <ImpactSection content={impactContent} />
       <CampaignsSection campaigns={campaigns} />
-      <CommunitySection content={communityContent} testimonials={testimonials} videoUrl={communityVideoConfig?.url} posterUrl={communityVideoConfig?.posterUrl} />
+      <CommunitySection
+        content={communityContent}
+        testimonials={testimonials}
+        mediaUrl={communityMediaUrl}
+        posterUrl={communityMediaConfig?.posterUrl}
+        mediaEnabled={communityMediaConfig?.enabled === true}
+        mediaType={communityMediaConfig?.mediaType ?? 'video'}
+      />
       <CTASection content={ctaContent} />
     </main>
   );

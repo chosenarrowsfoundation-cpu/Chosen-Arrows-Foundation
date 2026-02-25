@@ -12,15 +12,15 @@ export default async function AdminBlogPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Blog</h1>
-          <p className="text-muted-foreground">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Blog</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">
             Add and edit posts. Changes appear on the public blog immediately when published.
           </p>
         </div>
-        <Link href="/admin/blog/new">
-          <Button>
+        <Link href="/admin/blog/new" className="shrink-0">
+          <Button className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             New Post
           </Button>
@@ -47,22 +47,22 @@ export default async function AdminBlogPage() {
         ) : (
           posts.map((post) => (
             <Card key={post.id}>
-              <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-                <div className="space-y-1.5">
-                  <CardTitle className="text-lg flex items-center gap-2">
-                    {post.title}
-                    <Badge variant={post.status === 'published' ? 'default' : 'secondary'}>
+              <CardHeader className="flex flex-col gap-3 pb-2 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+                <div className="space-y-1.5 min-w-0 flex-1">
+                  <CardTitle className="text-lg flex flex-wrap items-center gap-2">
+                    <span className="break-words">{post.title}</span>
+                    <Badge variant={post.status === 'published' ? 'default' : 'secondary'} className="shrink-0">
                       {post.status}
                     </Badge>
                   </CardTitle>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground break-words">
                     /{post.slug}
                     {post.author_name && ` · ${post.author_name}`}
                     {' · '}
                     {formatDistanceToNow(new Date(post.updated_at), { addSuffix: true })}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 shrink-0">
                   {post.status === 'published' && (
                     <Link href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer">
                       <Button variant="ghost" size="icon" className="h-8 w-8">

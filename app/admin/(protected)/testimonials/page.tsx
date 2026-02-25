@@ -11,15 +11,15 @@ export default async function TestimonialsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Testimonials</h1>
-          <p className="text-muted-foreground">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Testimonials</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">
             Manage community testimonials and reviews
           </p>
         </div>
-        <Link href="/admin/testimonials/new">
-          <Button>
+        <Link href="/admin/testimonials/new" className="shrink-0">
+          <Button className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             Add Testimonial
           </Button>

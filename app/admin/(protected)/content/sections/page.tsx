@@ -26,9 +26,9 @@ export default async function ContentSectionsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Content Sections</h1>
-        <p className="text-muted-foreground mt-1">
+      <div className="min-w-0">
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Content Sections</h1>
+        <p className="text-muted-foreground text-sm mt-0.5">
           Edit homepage sections including the hero, values, impact, community, and CTA. Multi-language support.
         </p>
       </div>

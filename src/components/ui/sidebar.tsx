@@ -14,9 +14,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
-const SIDEBAR_WIDTH = "16rem";
-const SIDEBAR_WIDTH_MOBILE = "18rem";
-const SIDEBAR_WIDTH_ICON = "3rem";
+const SIDEBAR_WIDTH = "14rem";       /* 224px - standard compact admin sidebar */
+const SIDEBAR_WIDTH_MOBILE = "16rem"; /* 256px - mobile drawer */
+const SIDEBAR_WIDTH_ICON = "3rem";    /* 48px - collapsed icon rail */
 const SIDEBAR_KEYBOARD_SHORTCUT = "b";
 
 type SidebarContext = {

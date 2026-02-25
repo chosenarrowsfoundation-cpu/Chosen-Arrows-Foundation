@@ -234,9 +234,11 @@ export default function MediaLibrary({ initialImages }: MediaLibraryProps) {
                     <p className="text-xs font-medium truncate" title={image.name}>
                       {image.name}
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      {formatFileSize(image.size)}
-                    </p>
+                    {image.size > 0 && (
+                      <p className="text-xs text-muted-foreground">
+                        {formatFileSize(image.size)}
+                      </p>
+                    )}
                   </div>
                   <Button
                     type="button"

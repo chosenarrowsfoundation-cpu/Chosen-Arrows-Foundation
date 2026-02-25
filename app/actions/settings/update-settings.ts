@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createServiceRoleClient } from '@/lib/supabase/server'
 import { checkAdminAuth } from '@/app/actions/auth/check-admin-auth'
 import { revalidatePath } from 'next/cache'
 
@@ -21,7 +21,7 @@ export async function updateSetting(
     return { success: false, error: 'Unauthorized' }
   }
 
-  const supabase = await createClient()
+  const supabase = createServiceRoleClient()
 
   const { error } = await supabase
     .from('site_settings')
@@ -55,7 +55,7 @@ export async function updateMultipleSettings(
     return { success: false, error: 'Unauthorized' }
   }
 
-  const supabase = await createClient()
+  const supabase = createServiceRoleClient()
 
   const updates = settings.map(setting => ({
     setting_key: setting.key,

@@ -55,18 +55,22 @@ type Testimonial = {
   avatar_initials: string | null;
 };
 
-const DEFAULT_COMMUNITY_VIDEO = '/hero-background.mp4';
+const isImageUrl = (url: string) => /\.(jpg|jpeg|png|webp|gif)(\?|$)/i.test(url);
 
 const CommunitySection = ({ 
   content, 
   testimonials: testimonialsProp,
-  videoUrl,
+  mediaUrl, // Resolved on server (never empty when mediaEnabled) to avoid hydration mismatch
   posterUrl,
+  mediaEnabled = true,
+  mediaType = 'video',
 }: { 
   content?: CommunityContent;
   testimonials?: Testimonial[];
-  videoUrl?: string | null;
+  mediaUrl?: string | null;
   posterUrl?: string | null;
+  mediaEnabled?: boolean;
+  mediaType?: 'video' | 'image';
 }) => {
   const { t } = useTranslation();
   
@@ -95,30 +99,47 @@ const CommunitySection = ({
           </p>
         </div>
 
-        {/* Community Video */}
-        <div className="max-w-4xl mx-auto mb-12 md:mb-16">
-          <div className="relative overflow-hidden h-56 md:h-72 enterprise-card rounded-xl">
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              poster={posterUrl || undefined}
-              className="absolute inset-0 w-full h-full object-cover"
-            >
-              <source
-                src={videoUrl?.trim() || DEFAULT_COMMUNITY_VIDEO}
-                type={(videoUrl?.trim() || DEFAULT_COMMUNITY_VIDEO).toLowerCase().endsWith('.webm') ? 'video/webm' : 'video/mp4'}
-              />
-            </video>
-            <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
-            <div className="absolute bottom-6 left-6 right-6">
-              <p className="text-lg md:text-xl font-medium text-white">
-                {content?.imageCaption ?? t("community.imageCaption")}
-              </p>
+        {/* Community Media (video or image) - hidden when mediaEnabled is false */}
+        {mediaEnabled && (
+          <div className="max-w-4xl mx-auto mb-12 md:mb-16">
+            <div className="relative overflow-hidden h-56 md:h-72 enterprise-card rounded-xl">
+              {(() => {
+                const url = mediaUrl?.trim() ?? '';
+                const useImage = mediaType === 'image' || isImageUrl(url);
+                if (useImage) {
+                  return (
+                    <img
+                      src={url}
+                      alt=""
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  );
+                }
+                return (
+                  <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    poster={posterUrl || undefined}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  >
+                    <source
+                      src={url}
+                      type={url.toLowerCase().endsWith('.webm') ? 'video/webm' : 'video/mp4'}
+                    />
+                  </video>
+                );
+              })()}
+              <div className="absolute inset-0 bg-gradient-to-t from-foreground/80 via-foreground/20 to-transparent" />
+              <div className="absolute bottom-6 left-6 right-6">
+                <p className="text-lg md:text-xl font-medium text-white">
+                  {content?.imageCaption ?? t("community.imageCaption")}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Testimonials Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl mx-auto">

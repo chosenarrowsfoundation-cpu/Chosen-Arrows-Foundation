@@ -2,6 +2,7 @@
 
 import { useTranslation } from "react-i18next";
 import { FileText, Download, ExternalLink, Activity } from "lucide-react";
+import type { TransparencyDocument } from "@/app/actions/transparency/get-documents";
 
 const reportTypeKeys: Record<string, string> = {
   Impact: "typeImpact",
@@ -10,14 +11,19 @@ const reportTypeKeys: Record<string, string> = {
   Governance: "typeGovernance",
 };
 
-export default function TransparencyPageClient() {
+function formatFileSize(bytes: number | null): string {
+  if (!bytes) return "—";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+interface TransparencyPageClientProps {
+  documents: TransparencyDocument[];
+}
+
+export default function TransparencyPageClient({ documents }: TransparencyPageClientProps) {
   const { t } = useTranslation();
-  const reports = [
-    { title: "2024 Annual Impact Report", date: "January 2025", type: "Impact", size: "2.4 MB", url: "#" },
-    { title: "2024 Financial Statements", date: "January 2025", type: "Financial", size: "1.8 MB", url: "#" },
-    { title: "Q4 2024 Project Update", date: "December 2024", type: "Project", size: "1.2 MB", url: "#" },
-    { title: "Foundation Bylaws", date: "Updated 2024", type: "Governance", size: "0.5 MB", url: "#" },
-  ];
 
   return (
     <div className="container mx-auto px-4 py-24 min-h-screen">
@@ -61,38 +67,52 @@ export default function TransparencyPageClient() {
 
         <h2 className="text-2xl font-bold mb-6">{t("transparency.documentsReports")}</h2>
         <div className="space-y-4">
-          {reports.map((report, index) => (
-            <div
-              key={index}
-              className="group flex flex-col md:flex-row md:items-center justify-between p-6 bg-card border border-border rounded-lg hover:border-primary/50 transition-colors"
-            >
-              <div className="flex items-start gap-4 mb-4 md:mb-0">
-                <div className="p-2 bg-muted rounded text-muted-foreground">
-                  <FileText size={20} />
-                </div>
-                <div>
-                  <h4 className="font-semibold text-lg group-hover:text-primary transition-colors">
-                    {report.title}
-                  </h4>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
-                    <span>{report.date}</span>
-                    <span className="w-1 h-1 bg-border rounded-full"></span>
-                    <span>{t(`transparency.${reportTypeKeys[report.type]}`)}</span>
-                    <span className="w-1 h-1 bg-border rounded-full"></span>
-                    <span>{report.size}</span>
+          {documents.length === 0 ? (
+            <div className="p-8 text-center text-muted-foreground border border-dashed rounded-lg">
+              No documents yet. Check back soon for our annual reports and financial statements.
+            </div>
+          ) : (
+            documents.map((doc) => (
+              <div
+                key={doc.id}
+                className="group flex flex-col md:flex-row md:items-center justify-between p-6 bg-card border border-border rounded-lg hover:border-primary/50 transition-colors"
+              >
+                <div className="flex items-start gap-4 mb-4 md:mb-0">
+                  <div className="p-2 bg-muted rounded text-muted-foreground">
+                    <FileText size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-lg group-hover:text-primary transition-colors">
+                      {doc.title}
+                    </h4>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1 flex-wrap">
+                      <span>{doc.published_date ?? "—"}</span>
+                      <span className="w-1 h-1 bg-border rounded-full"></span>
+                      <span>{t(`transparency.${reportTypeKeys[doc.document_type] ?? doc.document_type}`)}</span>
+                      <span className="w-1 h-1 bg-border rounded-full"></span>
+                      <span>{formatFileSize(doc.file_size_bytes)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <a
-                href={report.url}
-                className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors text-sm font-medium"
-              >
-                <Download size={16} className="mr-2" />
-                {t("transparency.download")}
-              </a>
-            </div>
-          ))}
+                {doc.file_url && doc.file_url !== "#" ? (
+                  <a
+                    href={doc.file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors text-sm font-medium"
+                  >
+                    <Download size={16} className="mr-2" />
+                    {t("transparency.download")}
+                  </a>
+                ) : (
+                  <span className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-muted text-muted-foreground text-sm font-medium">
+                    Coming soon
+                  </span>
+                )}
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

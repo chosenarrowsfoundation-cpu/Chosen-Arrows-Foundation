@@ -12,18 +12,13 @@ export type MediaFile = {
 }
 
 /**
- * Lists all images in a storage folder.
+ * Lists files in a path. For folders (items with id === null), recursively lists contents.
+ * Campaign images live in campaigns/{campaignId}/filename.jpg, so we must recurse into campaign subfolders.
  */
-export async function listImages(
-  folder: string = ''
+async function listRecursive(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  folder: string
 ): Promise<MediaFile[]> {
-  const { user, error: authError } = await checkAdminAuth()
-  if (authError || !user) {
-    return []
-  }
-
-  const supabase = await createClient()
-
   const { data, error } = await supabase.storage
     .from('images')
     .list(folder, {
@@ -37,11 +32,43 @@ export async function listImages(
     return []
   }
 
-  return (data || []).map(file => ({
-    name: file.name,
-    path: folder ? `${folder}/${file.name}` : file.name,
-    url: supabase.storage.from('images').getPublicUrl(folder ? `${folder}/${file.name}` : file.name).data.publicUrl,
-    size: file.metadata?.size || 0,
-    updated_at: file.updated_at || file.created_at,
-  }))
+  const imageExtensions = /\.(jpg|jpeg|png|webp|gif)$/i
+  const files: MediaFile[] = []
+  for (const item of data || []) {
+    const fullPath = folder ? `${folder}/${item.name}` : item.name
+    const hasImageExt = imageExtensions.test(item.name)
+    const looksLikeFile = hasImageExt || (Number(item.metadata?.size) > 0 && item.metadata?.mimetype)
+    const isFolder = !looksLikeFile
+
+    if (isFolder) {
+      // Recurse into subfolder (e.g. campaigns/campaignId)
+      const nested = await listRecursive(supabase, fullPath)
+      files.push(...nested)
+    } else {
+      files.push({
+        name: item.name,
+        path: fullPath,
+        url: supabase.storage.from('images').getPublicUrl(fullPath).data.publicUrl,
+        size: item.metadata?.size ?? 0,
+        updated_at: item.updated_at || item.created_at || '',
+      })
+    }
+  }
+  return files
+}
+
+/**
+ * Lists all images in a storage folder.
+ * For the campaigns folder, recursively lists files inside campaign subfolders.
+ */
+export async function listImages(
+  folder: string = ''
+): Promise<MediaFile[]> {
+  const { user, error: authError } = await checkAdminAuth()
+  if (authError || !user) {
+    return []
+  }
+
+  const supabase = await createClient()
+  return listRecursive(supabase, folder)
 }

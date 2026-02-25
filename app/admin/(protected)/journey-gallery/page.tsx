@@ -13,16 +13,16 @@ export default async function JourneyGalleryPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" asChild>
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div className="flex items-start gap-3 min-w-0">
+          <Button variant="ghost" size="icon" asChild className="shrink-0">
             <Link href="/admin/media">
               <ArrowLeft className="h-4 w-4" />
             </Link>
           </Button>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">Our Journey in Pictures</h1>
-            <p className="text-muted-foreground">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Our Journey in Pictures</h1>
+            <p className="text-muted-foreground text-sm mt-0.5">
               Images shown on the About page. Add from the Journey folder in Media, or reorder and edit captions.
             </p>
           </div>

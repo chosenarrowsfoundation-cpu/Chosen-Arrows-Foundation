@@ -67,20 +67,20 @@ export function DashboardClient({ initialStats }: DashboardClientProps) {
   return (
     <div className="space-y-6 w-full max-w-full overflow-hidden">
       {/* Compact Header */}
-      <div className="flex items-center justify-between border-b pb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
+      <div className="flex flex-col gap-4 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="p-2 bg-primary/10 rounded-lg shrink-0">
             <LayoutDashboard className="h-5 w-5 text-primary" />
           </div>
-          <div>
-            <h1 className="text-xl font-semibold tracking-tight">Overview</h1>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Updated {formatDistanceToNow(lastUpdated)} ago</span>
+          <div className="min-w-0">
+            <h1 className="text-lg font-semibold tracking-tight sm:text-xl">Overview</h1>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span className="truncate">Updated {formatDistanceToNow(lastUpdated)} ago</span>
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           <Button variant="ghost" size="icon" onClick={refreshData} disabled={isRefreshing} className="h-8 w-8">
             <RefreshCw className={cn('h-4 w-4', isRefreshing && 'animate-spin')} />
           </Button>

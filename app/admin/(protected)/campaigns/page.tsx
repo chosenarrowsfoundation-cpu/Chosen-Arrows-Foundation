@@ -10,20 +10,20 @@ export default async function CampaignsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between border-b pb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-primary/10 rounded-lg">
+      <div className="flex flex-col gap-4 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-start gap-3 min-w-0">
+          <div className="p-2 bg-primary/10 rounded-lg shrink-0">
             <Flag className="h-5 w-5 text-primary" />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Child Sponsorship Campaigns</h1>
-            <p className="text-sm text-muted-foreground">
+          <div className="min-w-0">
+            <h1 className="text-xl font-bold tracking-tight sm:text-2xl">Child Sponsorship Campaigns</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
               Manage all fundraising campaigns and child sponsorship data. Click any campaign title or Edit to modify.
             </p>
           </div>
         </div>
-        <Link href="/admin/campaigns/new">
-          <Button>
+        <Link href="/admin/campaigns/new" className="shrink-0">
+          <Button className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             Create Campaign
           </Button>
