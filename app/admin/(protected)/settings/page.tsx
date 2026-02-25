@@ -2,6 +2,7 @@ import { getAllSettings } from '@/app/actions/settings/get-settings'
 import { getIntegrationConfigForAdmin } from '@/lib/integration-config'
 import SiteSettingsEditor from '@/components/admin/SiteSettingsEditor'
 import IntegrationConfigEditor from '@/components/admin/IntegrationConfigEditor'
+import ChangeAdminPasswordForm from '@/components/admin/ChangeAdminPasswordForm'
 
 export default async function SettingsPage() {
   const [settings, integrationConfig] = await Promise.all([
@@ -22,6 +23,8 @@ export default async function SettingsPage() {
           Manage site settings and API integrations
         </p>
       </div>
+
+      <ChangeAdminPasswordForm />
 
       <IntegrationConfigEditor initialConfig={integrationConfig} />
 
