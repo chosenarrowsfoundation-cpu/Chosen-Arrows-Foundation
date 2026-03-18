@@ -40,6 +40,9 @@ export async function updateSetting(
 
   revalidatePath('/')
   revalidatePath('/admin/settings')
+  if (settingKey === 'manual_payment_details') {
+    revalidatePath('/donate')
+  }
 
   return { success: true }
 }
@@ -76,6 +79,9 @@ export async function updateMultipleSettings(
 
   revalidatePath('/')
   revalidatePath('/admin/settings')
+  if (settings.some(s => s.key === 'manual_payment_details')) {
+    revalidatePath('/donate')
+  }
 
   return { success: true }
 }

@@ -2,6 +2,7 @@ import { getAllSettings } from '@/app/actions/settings/get-settings'
 import { getIntegrationConfigForAdmin } from '@/lib/integration-config'
 import SiteSettingsEditor from '@/components/admin/SiteSettingsEditor'
 import IntegrationConfigEditor from '@/components/admin/IntegrationConfigEditor'
+import ManualPaymentEditor from '@/components/admin/ManualPaymentEditor'
 import ChangeAdminPasswordForm from '@/components/admin/ChangeAdminPasswordForm'
 
 export default async function SettingsPage() {
@@ -15,6 +16,8 @@ export default async function SettingsPage() {
     settingsMap[setting.setting_key] = setting.setting_value
   })
 
+  const manualPayment = settingsMap.manual_payment_details as { bank?: { bankName?: string; accountName?: string; accountNumber?: string; swiftCode?: string; currency?: string }; mpesa?: { number?: string; name?: string; instructions?: string } } | null
+
   return (
     <div className="space-y-8">
       <div className="min-w-0">
@@ -27,6 +30,27 @@ export default async function SettingsPage() {
       <ChangeAdminPasswordForm />
 
       <IntegrationConfigEditor initialConfig={integrationConfig} />
+
+      <ManualPaymentEditor
+        initialData={
+          manualPayment?.bank && manualPayment?.mpesa
+            ? {
+                bank: {
+                  bankName: manualPayment.bank.bankName ?? '',
+                  accountName: manualPayment.bank.accountName ?? '',
+                  accountNumber: manualPayment.bank.accountNumber ?? '',
+                  swiftCode: manualPayment.bank.swiftCode ?? '',
+                  currency: manualPayment.bank.currency ?? '',
+                },
+                mpesa: {
+                  number: manualPayment.mpesa.number ?? '',
+                  name: manualPayment.mpesa.name ?? '',
+                  instructions: manualPayment.mpesa.instructions ?? '',
+                },
+              }
+            : null
+        }
+      />
 
       <SiteSettingsEditor initialSettings={settingsMap} />
     </div>

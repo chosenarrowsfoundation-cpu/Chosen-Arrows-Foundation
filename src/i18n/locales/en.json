@@ -227,6 +227,8 @@
     "emailInvalid": "Please enter a valid email address",
     "emailMax": "Email must be less than 255 characters",
     "selectPaymentMethod": "Select Payment Method",
+    "cardPayPal": "Card or PayPal",
+    "or": "or",
     "cardMobile": "Card/Mobile",
     "manual": "Manual",
     "paySecurely": "Securely pay with Credit/Debit Card or Mobile Money (M-Pesa).",

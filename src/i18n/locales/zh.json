@@ -227,6 +227,8 @@
     "emailInvalid": "请输入有效的邮箱地址",
     "emailMax": "邮箱不能超过255个字符",
     "selectPaymentMethod": "选择支付方式",
+    "cardPayPal": "卡或PayPal",
+    "or": "或",
     "cardMobile": "卡/手机支付",
     "manual": "手动转账",
     "paySecurely": "可通过信用卡/借记卡或移动支付（M-Pesa）安全支付。",

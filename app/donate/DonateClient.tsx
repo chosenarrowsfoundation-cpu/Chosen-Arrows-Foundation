@@ -366,99 +366,104 @@ export default function DonateClient({
                     {/* Payment Methods */}
                     <div className="pt-4">
                       <Label className="text-lg font-semibold mb-4 block">{t("donate.selectPaymentMethod")}</Label>
-                      <Tabs defaultValue="card" className="w-full">
-                        <TabsList className="grid w-full grid-cols-3 mb-6">
-                          <TabsTrigger value="card" className="flex gap-2 text-xs md:text-sm px-1 md:px-3">
-                            <CreditCard className="w-4 h-4 hidden md:block" /> {t("donate.cardMobile")}
-                          </TabsTrigger>
-                          <TabsTrigger value="paypal" className="flex gap-2 text-xs md:text-sm px-1 md:px-3">
-                            <span className="text-[#003087] font-bold">Pay</span><span className="text-[#009cde] font-bold">Pal</span>
+                      <Tabs defaultValue="online" className="w-full">
+                        <TabsList className="grid w-full grid-cols-2 mb-6">
+                          <TabsTrigger value="online" className="flex gap-2 text-xs md:text-sm px-1 md:px-3">
+                            <CreditCard className="w-4 h-4 hidden md:block" /> {t("donate.cardPayPal")}
                           </TabsTrigger>
                           <TabsTrigger value="manual" className="flex gap-2 text-xs md:text-sm px-1 md:px-3">
                             <Banknote className="w-4 h-4 hidden md:block" /> {t("donate.manual")}
                           </TabsTrigger>
                         </TabsList>
 
-                        {/* FLUTTERWAVE (Card & Mobile Money) */}
-                        <TabsContent value="card" className="space-y-4">
-                          <div className="bg-muted/50 p-4 rounded-lg border border-muted text-sm text-muted-foreground mb-4">
-                            <p>{t("donate.paySecurely")}</p>
-                          </div>
-
-                          {flutterwavePublicKey ? (
-                            <div className="flex justify-center">
-                              <FlutterWaveButton
-                                className="w-full h-12 bg-gradient-to-r from-mint-500 to-taffy-500 hover:from-mint-600 hover:to-taffy-600 text-white font-bold rounded-md shadow-md transition-all flex items-center justify-center gap-2"
-                                text={t("donate.donateAmount", { amount: form.getValues("amount") || selectedAmount })}
-                                callback={(response) => {
-                                  console.log(response);
-                                  closePaymentModal();
-                                  if (response.status === "successful") {
-                                    window.location.href = "/donate/success?payment=flutterwave&ref=" + response.tx_ref;
-                                  } else {
-                                    toast.error(t("donate.paymentNotCompleted"));
-                                  }
-                                }}
-                                onClose={() => { }}
-                                // @ts-ignore
-                                {...{
-                                  public_key: flutterwavePublicKey,
-                                  tx_ref: Date.now().toString(),
-                                  amount: Number(form.getValues("amount") || selectedAmount),
-                                  currency: "USD",
-                                  payment_options: "card,mobilemoney,ussd",
-                                  customer: {
-                                    email: form.getValues("email") || "donor@chosenarrows.org",
-                                    phone_number: "",
-                                    name: form.getValues("name") || "Anonymous",
-                                  },
-                                  customizations: {
-                                    title: "Chosen Arrows Donation",
-                                    description: "Donation Support",
-                                    logo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://chosen-arrows-foundation-six.vercel.app"}/logo.png`,
-                                  },
-                                }}
-                              />
-                            </div>
-                          ) : (
-                            <p className="text-destructive text-center text-sm bg-destructive/10 p-2 rounded">
-                              {t("donate.flutterwaveMissing")}
-                            </p>
-                          )}
-                        </TabsContent>
-
-                        {/* PAYPAL */}
-                        <TabsContent value="paypal" className="space-y-4">
-                          {paypalClientId ? (
-                            <div className="space-y-3 min-h-[150px]">
-                              <p className="text-sm font-medium text-center text-muted-foreground mb-2">
-                                {t("donate.paypalSecure")}
-                              </p>
-                              <PayPalScriptProvider
-                                options={{
-                                  clientId: paypalClientId,
-                                  currency: "USD",
-                                  intent: "capture",
-                                }}
-                              >
-                                <PayPalButtons
-                                  style={{ layout: "vertical", label: "donate", height: 48 }}
-                                  createOrder={createOrder}
-                                  onApprove={onApprove}
-                                  onError={(err) => {
-                                    const msg = err && typeof err === "object" && "message" in err
-                                      ? String((err as { message: unknown }).message)
-                                      : "PayPal error. Please try again.";
-                                    toast.error(msg);
+                        {/* CARD (Flutterwave) + PAYPAL - merged */}
+                        <TabsContent value="online" className="space-y-6">
+                          <div className="space-y-4">
+                            {/* Flutterwave (Card & Mobile Money) */}
+                            {flutterwavePublicKey && (
+                              <div>
+                                <p className="text-sm font-medium text-muted-foreground mb-2">
+                                  {t("donate.cardMobile")}
+                                </p>
+                                <FlutterWaveButton
+                                  className="w-full h-12 bg-gradient-to-r from-mint-500 to-taffy-500 hover:from-mint-600 hover:to-taffy-600 text-white font-bold rounded-md shadow-md transition-all flex items-center justify-center gap-2"
+                                  text={t("donate.donateAmount", { amount: form.getValues("amount") || selectedAmount })}
+                                  callback={(response) => {
+                                    console.log(response);
+                                    closePaymentModal();
+                                    if (response.status === "successful") {
+                                      window.location.href = "/donate/success?payment=flutterwave&ref=" + response.tx_ref;
+                                    } else {
+                                      toast.error(t("donate.paymentNotCompleted"));
+                                    }
+                                  }}
+                                  onClose={() => { }}
+                                  // @ts-ignore
+                                  {...{
+                                    public_key: flutterwavePublicKey,
+                                    tx_ref: Date.now().toString(),
+                                    amount: Number(form.getValues("amount") || selectedAmount),
+                                    currency: "USD",
+                                    payment_options: "card,mobilemoney,ussd",
+                                    customer: {
+                                      email: form.getValues("email") || "donor@chosenarrows.org",
+                                      phone_number: "",
+                                      name: form.getValues("name") || "Anonymous",
+                                    },
+                                    customizations: {
+                                      title: "Chosen Arrows Donation",
+                                      description: "Donation Support",
+                                      logo: `${process.env.NEXT_PUBLIC_SITE_URL || "https://chosen-arrows-foundation-six.vercel.app"}/logo.png`,
+                                    },
                                   }}
                                 />
-                              </PayPalScriptProvider>
-                            </div>
-                          ) : (
-                            <p className="text-sm text-center text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200">
-                              {t("donate.paypalNotConfigured")}
-                            </p>
-                          )}
+                              </div>
+                            )}
+
+                            {/* Divider */}
+                            {(flutterwavePublicKey && paypalClientId) && (
+                              <div className="relative">
+                                <div className="absolute inset-0 flex items-center">
+                                  <span className="w-full border-t" />
+                                </div>
+                                <div className="relative flex justify-center text-xs uppercase">
+                                  <span className="bg-card px-2 text-muted-foreground">{t("donate.or")}</span>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* PayPal */}
+                            {paypalClientId ? (
+                              <div className="space-y-3 min-h-[100px]">
+                                <p className="text-sm font-medium text-muted-foreground mb-2">
+                                  PayPal
+                                </p>
+                                <PayPalScriptProvider
+                                  options={{
+                                    clientId: paypalClientId,
+                                    currency: "USD",
+                                    intent: "capture",
+                                  }}
+                                >
+                                  <PayPalButtons
+                                    style={{ layout: "vertical", label: "donate", height: 48 }}
+                                    createOrder={createOrder}
+                                    onApprove={onApprove}
+                                    onError={(err) => {
+                                      const msg = err && typeof err === "object" && "message" in err
+                                        ? String((err as { message: unknown }).message)
+                                        : "PayPal error. Please try again.";
+                                      toast.error(msg);
+                                    }}
+                                  />
+                                </PayPalScriptProvider>
+                              </div>
+                            ) : (
+                              <p className="text-sm text-center text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg border border-amber-200">
+                                {t("donate.paypalNotConfigured")}
+                              </p>
+                            )}
+                          </div>
                         </TabsContent>
 
                         {/* MANUAL TRANSFERS */}
